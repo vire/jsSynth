@@ -1,7 +1,7 @@
 {
   "framework": "jasmine2",
   "src_files": [
-    "./js/sequencer.js",
-    "./test/sequencer_spec.js"
+    "./js/**.js",
+    "./test/**.js"
   ]
 }

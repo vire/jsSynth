@@ -1,5 +1,12 @@
 var Sequencer;
 
+/**
+* TODOs:
+* add channel support - type of channel, binds to a sound playable instance
+* add pattern per channel (array of object with state active/inactive, type)
+* implement run method - moves the cursor per channel's pattern 
+* implement BPM, timing, notes, tempo
+*/
 Sequencer = (function() {
   function Sequencer(name, bars, tracks) {
     this.name = name || '';
