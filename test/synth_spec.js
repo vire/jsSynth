@@ -2,46 +2,76 @@
 var MockContext = window.AudioContext;
 
 var MockContextProto = MockContext.prototype;
-var ctx = new MockContext();
 var synth = new Synth();
-
+var buffer, ctx, result;
 
 describe('AudioContext', function() {
 
-  describe('should be', function() {    
-    it('defined as a global function', function() {
+  beforeEach(function() {
+    ctx = new MockContext();
+  });
+
+  afterEach(function() {
+    ctx = null;
+  });
+
+  describe('should', function() {
+    it('be defined as a global function', function() {
+      expect(window.MockContext).toBeDefined();
       expect(typeof MockContext).toBe('function');
     });
-    it('returning an object instance', function() {
-      var audioCtx = new MockContext();
-      expect(typeof audioCtx).toBe('object');
+
+    it('return an `AudioContext` instance', function() {
+      expect(ctx.constructor.name).toMatch('AudioContext')
     });
   });
 
-  describe('should have', function() {
+  describe('.createBuffer() method should', function() {
+    beforeEach(function() {
+      spyOn(ctx, 'createBuffer').and.callThrough()
+      buffer = ctx.createBuffer(2, 88200, 44100);
+    });
 
-    it('a defined `createWhiteNoise` mehtod', function() {
+    afterEach(function() {
+      buffer = null
+    });
+
+    it('return an `AudioBuffer` instance', function() {
+      expect(buffer).toBeDefined();
+      expect(ctx.createBuffer).toHaveBeenCalled();
+      expect(buffer.constructor.name).toMatch('AudioBuffer');
+    })
+
+  })
+
+  describe('.createWhiteNoise() mehtod should', function() {
+
+    beforeEach(function() {
+      spyOn(ctx, 'createWhiteNoise').and.callThrough();
+      result = ctx.createWhiteNoise();
+    });
+
+    afterEach(function() {
+      result = null
+    })
+
+    it('be defined on AudioContext', function() {
       var whiteNoiseProp = MockContextProto.hasOwnProperty('createWhiteNoise');
       expect(typeof MockContextProto.createWhiteNoise).toBe('function'); 
       expect(whiteNoiseProp).toBeTruthy();
     });
 
-    it('`createWhiteNoise` implemented to return an object', function() {
-      var result = null;
-      spyOn(ctx, 'createWhiteNoise').and.callThrough();
-
-      result = ctx.createWhiteNoise();
+    it('return an `AudioBufferSourceNode` instance', function() {
       expect(ctx.createWhiteNoise).toHaveBeenCalled();
       expect(result).toBeDefined();
       expect(result.constructor.name).toMatch('AudioBufferSourceNode');
-
-    });
-
-    it('an .createFeedbackDelay() method ');
-    it('an .createReverb() method ');
-    it('an .createPinkNoise() method ');
-    it('an .createBrownNoise() method ');
+    });    
   });
+
+  describe('createFeedbackDelay() method', function() {});
+  describe('createReverb() method', function() {});
+  describe('createPinkNoise() method', function() {});
+  describe('createBrownNoise() method', function() {});
 });
 
 /** Requires a synt Instance */
