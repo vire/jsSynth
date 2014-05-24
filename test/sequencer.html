@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="target-densitydpi=device-dpi, initial-scale=1.0, user-scalable=no" />
+	<meta charset="utf-8">
+	<style type="text/css">
+		#sequencer {
+			background: #E0E0E0;
+			height: 770px;
+			width: 1024px;
+		}
+
+		#sequencer-settings{
+			background: #707070;
+			float: right;
+			height: 10%;
+			width: 80%;
+		}
+
+		#notes-bar {
+			background: #BEBEBE;
+			height: 90%;
+			width: 20%;
+			float: left;
+		}
+
+		#sequencer-controls {
+			background: #525252;
+			float: left;
+			height: 10%;
+			width: 20%;
+			color:white;
+		}
+
+		span.sequencer-controls-button  {
+			cursor: pointer;
+
+		}
+
+		#sequencer-settings {
+			color: white;
+			overflow: hidden;
+		}
+
+		#sequencer-settings input[type=text] {
+			width: 30px;
+		}
+
+		#pattern-area {
+			width: 80%;
+			height: 90%;
+			background: #616191;
+			float: left;
+		}
+
+		*.unselectable {
+			-moz-user-select: none;
+			-khtml-user-select: none;
+			-webkit-user-select: none;
+
+		   /*
+		     Introduced in IE 10.
+		     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+		     */
+		     -ms-user-select: none;
+		     user-select: none;
+		 }
+		</style>
+		<script type="text/javascript" src="./../js/jquery.min.js"></script>
+	</head>
+	<body>
+		<div id="sequencer">
+			<div id="sequencer-controls">
+				<span class="sequencer-controls-button unselectable">play</span> | stop | pause |
+				add | clear
+			</div>
+			<div id="sequencer-settings">
+				<div class="tempo">
+					<label for="measure-inp">Tempo</label><input type="text" value="140"> BPM
+
+				</div>
+				<div class="signature">
+					<label for="sig-first">Signature</label><input type="text" name="sig-first" value="4"> / <label for="sig-second"></label><input type="text" name="sig-second" value="4">
+				</div>
+				<div class="measure">
+					<label for="measure-inp">Measure</label><input type="text" value="1">
+				</div>
+			</div>
+			<div id="notes-bar">
+			</div>
+			<div id="pattern-area">
+			</div>
+		</div>
+	</body>
+	</html>

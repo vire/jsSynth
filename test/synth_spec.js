@@ -1,10 +1,10 @@
-/* global Synth, describe, it,  afterEach*/
+/* global Synth, describe, it, beforeEach, expect, afterEach, spyOn */
 
 'use strict';
 var MockContext = window.AudioContext;
 var ctx = new MockContext();
 var MockContextProto = MockContext.prototype;
-// var synth = new Synth();
+var synth = new Synth();
 var buffer, err, ctx, result;
 
 describe('AudioContext', function() {
@@ -109,17 +109,18 @@ describe('AudioContext', function() {
     });
     it('must throw an Error when called without param', function() {
       var err = null;
+      var failString = 'Failed to execute \'createBuffer\' on \'AudioContext\': number of frames must be greater than 0.';
       try {
         ctx.createReverb();
       } catch(e) {
         err = e;
       }
-      expect(err.message).toMatch('Failed to execute \'createBuffer\' on \'AudioContext\': number of frames must be greater than 0.')
+      expect(err.message).toMatch(failString);
     });
     it('must return a `ConvolverNode` instance', function() {
       expect(result).toBeDefined();
       expect(result.constructor.name).toMatch('ConvolverNode');
-    })
+    });
   });
   describe('.createPinkNoise() method', function() {});
   describe('.createBrownNoise() method', function() {});
