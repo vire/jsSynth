@@ -34,6 +34,5 @@ describe('Sequencer', function() {
       expect(seq.stop).toHaveBeenCalled();
       expect(seq.isPlaying).toBeFalsy();
     });
-
   })
 })
