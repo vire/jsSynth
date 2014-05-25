@@ -1,25 +1,25 @@
-/* globals Looper, describe, beforeEach, spyOn, afterEach, it, expect */
+/* globals Looper, describe, beforeEach, spyOn, afterEach, it, xit, expect */
 'use strict';
 describe('Looper', function() {
   var looper , mockEmitter =  {
       whoami: this.constructor.name,
       // subscriber needs an class:method to subscribe, its context, + opt args
       subscribers: {
-        "start" : function() {
-          console.log("I am an start subscriber and this is value a: %o", this.whoami);
+        'start' : function() {
+          // console.log("I am an start subscriber and this is value a: %o", this.whoami);
         },
-        "stop" : function() {
-          console.log("I am an stop subscriber");
+        'stop' : function() {
+          // console.log("I am an stop subscriber");
         },
-        "tick" : function() {
-          console.log("I am an tick subscriber");
+        'tick' : function() {
+          // console.log("I am an tick subscriber");
         },
       },
 
       emit: function(event) {
-        var subscriber = event.substring(event.indexOf(":") + 1);
+        var subscriber = event.substring(event.indexOf(':') + 1);
 
-        var action = this.subscribers[subscriber]
+        var action = this.subscribers[subscriber];
         if('undefined' !== action ) {
           action.call(this);  
         }        
@@ -44,11 +44,14 @@ describe('Looper', function() {
     it('should be defined on global', function() {
       expect(Looper).toBeDefined();
     });
+    it('without a proper emitter, the looper.emitter is falsy', function() {
+      expect(looper.eventEmitter).toEqual(false);
+    });
     it('Looper.loopength', function() {
       expect(looper.loopLength).toBeDefined();
       expect(looper.loopLength).toBe(16);
 
-    })
+    });
     it('start() the looper and set `looping` prop to true', function() {
       expect(looper.start).toHaveBeenCalled();
       expect(looper.looping).toBeTruthy();
@@ -72,18 +75,22 @@ describe('Looper', function() {
     
 
     beforeEach(function() {
-      looper = Looper.getInstance()
+      looper = Looper.getInstance();
       looper.addEmitter({e:mockEmitter});
-      looper.start();
+      spyOn(mockEmitter, 'emit').and.callThrough();
+      looper.start();      
     });
 
     afterEach(function() {
       looper.stop();
-    })
+    });
+
+    it('addEmitter() passes an emitter instance to looper', function() {
+      expect(looper.eventEmitter).toBeTruthy();
+    });
 
     xit('iterates the cursor', function(done) {
       setTimeout(function() {
-        console.log('looper in test', looper)
         expect(looper.looping).toBeTruthy();
         
         // after 3 seconds cursor shoudl be 0..1..2
@@ -96,7 +103,8 @@ describe('Looper', function() {
       looper.start();
       expect(looper.looping).toBeTruthy();
     });
-
-
-  })
+    it('emit() should have ben triggerd' , function() {
+      expect(mockEmitter.emit).toHaveBeenCalled();
+    });
+  });
 });

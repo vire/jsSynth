@@ -4,6 +4,7 @@
 */
 
 Looper = (function() {
+  'use strict';
   Looper.instance = null;
 
   /**
@@ -20,7 +21,7 @@ Looper = (function() {
     this.tickDuration = options.tickDuration || 1000;
 
     // abstraction of measures
-    this.innerLoops = options.innerLoops || 1
+    this.innerLoops = options.innerLoops || 1;
     
     // beats per loop
     this.loopSections = options.loopSections || 4;
@@ -31,7 +32,7 @@ Looper = (function() {
     // loopLenght consists of innerIterations, steps per innerIteration
     this.loopLength = this.innerLoops * this.loopSections * this.loopSectionLegnth;
 
-    this.addEmitter(options.e)
+    this.addEmitter(options.e);
 
   }
 
@@ -44,30 +45,27 @@ Looper = (function() {
   };
 
   Looper.prototype.validateEmitter = function(extEm) {
-    console.log("EEE", extEm);
     if(!extEm) {
       this.eventEmitter = false;
       return {
+        failedCalls: 0,
         emit: function(event) {
-          console.log('no subscriber for this event: %s', event);
-        }
+          this.failedCalls++;        }
       };
     } else {
       this.eventEmitter = true;
-      return extEm.e
-    };
+      return extEm.e;
+    }
   };
 
   Looper.prototype.addEmitter = function(em) {
-    console.log("ZZZ",this.validateEmitter(em))
     this.e = this.validateEmitter(em);
-  }
+  };
 
   Looper.prototype.start = function() {
-    console.debug('Looper:start()');
     this.looping = true;
     this.tick();
-    this.e.emit('loop:start')
+    this.e.emit('loop:start');
   };
   
   /**
@@ -76,15 +74,15 @@ Looper = (function() {
   */
   Looper.prototype.tick = function() {
     if(this.looping) {
-      this.transitionTimeout = setTimeout(this.tick.bind(this), this.tickDuration)
-    };
+      this.transitionTimeout = setTimeout(this.tick.bind(this), this.tickDuration);
+    }
 
     this.cursor++;
 
     // if the cursor reaches the end of the loop - reset to initial position
     if(this.cursor > (this.loopLength - 1)) {
       this.cursor = 0;
-    };
+    }
     this.e.emit('loop:tick');
   };
 
@@ -92,7 +90,7 @@ Looper = (function() {
     this.looping = false;
     if(this.transitionTimeout) {
       this.disarm();
-    };
+    }
     this.resetCursor();
     this.e.emit('loop:stop');
   };
