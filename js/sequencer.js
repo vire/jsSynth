@@ -18,8 +18,8 @@ Sequencer = (function() {
   Sequencer.prototype.cursor = 'position in bars and bar';
 
   Sequencer.prototype.getCursor = function() {
-    throw new Error("not yet implemented");
-  };
+    throw new Error("not yet implemented")
+;  };
 
   Sequencer.prototype.start = function() {
     return this.isPlaying = true;

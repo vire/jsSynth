@@ -1,10 +1,20 @@
+/**
+* Looper class, responsible for iteration and sequence logic.
+* Heavily inspired by the {@link https://github.com/michd/step-sequencer/blob/master/assets/js/tempo.js}
+*/
+
 Looper = (function() {
   Looper.instance = null;
 
   function Looper(options) {
     this.cursor = -1;
-    this.transTimeout = null;
-    this.options = options || {};
+    this.transitionTimeout = null;
+    
+    //  iterate over options and add them to the props?
+    options = options || {};
+
+    this.tickDuration = options.tickDuration || 1000;
+    this.loopLength = options.loopLength || 10;
   }
 
   Looper.getInstance = function() {
@@ -16,25 +26,42 @@ Looper = (function() {
   };
 
   Looper.prototype.start = function() {
+    console.debug('Looper:start()');
     this.looping = true;
     this.tick();
   };
   
+  /**
+  * @method Looper#tick
+  * Iterates over the loop, update transitionTimeout , increment cursor;
+  */
   Looper.prototype.tick = function() {
-    'do some logic'
+    if(this.looping) {
+      this.transitionTimeout = setTimeout(this.tick.bind(this), this.tickDuration)
+    };
+
+    this.cursor++;
+
+    // if the cursor reaches the end of the loop - reset to initial position
+    if(this.cursor > (this.loopLength - 1)) {
+      this.cursor = 0;
+    };
   };
 
   Looper.prototype.stop = function() {
     this.looping = false;
-    if(this.transTimeout) this.disarm();
+    if(this.transitionTimeout) {
+      this.disarm();
+    };
+    this.resetCursor();
   };
 
   Looper.prototype.disarm = function() {
-    clearTimeout(this.transTimeout);
+    clearTimeout(this.transitionTimeout);
   };
 
   Looper.prototype.resetCursor = function() {
-    this.cursor  > 0 ? -1 : this.cursor;
+    this.cursor = -1;
   };
 
   return Looper;
