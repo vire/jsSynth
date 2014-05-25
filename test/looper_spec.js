@@ -1,11 +1,34 @@
 /* globals Looper, describe, beforeEach, spyOn, afterEach, it, expect */
 'use strict';
 describe('Looper', function() {
-  var looper;
+  var looper , mockEmitter =  {
+      whoami: this.constructor.name,
+      // subscriber needs an class:method to subscribe, its context, + opt args
+      subscribers: {
+        "start" : function() {
+          console.log("I am an start subscriber and this is value a: %o", this.whoami);
+        },
+        "stop" : function() {
+          console.log("I am an stop subscriber");
+        },
+        "tick" : function() {
+          console.log("I am an tick subscriber");
+        },
+      },
+
+      emit: function(event) {
+        var subscriber = event.substring(event.indexOf(":") + 1);
+
+        var action = this.subscribers[subscriber]
+        if('undefined' !== action ) {
+          action.call(this);  
+        }        
+      }
+    };
 
   describe('core tests', function() {
     beforeEach(function() {
-      looper = Looper.getInstance();
+      looper = Looper.getInstance();      
       spyOn(looper, 'start').and.callThrough();
       spyOn(looper, 'stop').and.callThrough();
       spyOn(looper, 'tick').and.callThrough();
@@ -21,6 +44,11 @@ describe('Looper', function() {
     it('should be defined on global', function() {
       expect(Looper).toBeDefined();
     });
+    it('Looper.loopength', function() {
+      expect(looper.loopLength).toBeDefined();
+      expect(looper.loopLength).toBe(16);
+
+    })
     it('start() the looper and set `looping` prop to true', function() {
       expect(looper.start).toHaveBeenCalled();
       expect(looper.looping).toBeTruthy();
@@ -41,9 +69,11 @@ describe('Looper', function() {
   });
 
   describe('start - stop, ' ,function() {
+    
 
     beforeEach(function() {
-      looper = Looper.getInstance();
+      looper = Looper.getInstance()
+      looper.addEmitter({e:mockEmitter});
       looper.start();
     });
 
@@ -51,7 +81,7 @@ describe('Looper', function() {
       looper.stop();
     })
 
-    it('iterates the cursor', function(done) {
+    xit('iterates the cursor', function(done) {
       setTimeout(function() {
         console.log('looper in test', looper)
         expect(looper.looping).toBeTruthy();
@@ -65,6 +95,8 @@ describe('Looper', function() {
     it('calling start() twice doesn\'t break anything', function() {
       looper.start();
       expect(looper.looping).toBeTruthy();
-    })
+    });
+
+
   })
 });

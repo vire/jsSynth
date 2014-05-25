@@ -6,6 +6,9 @@
 Looper = (function() {
   Looper.instance = null;
 
+  /**
+  * @Constructor
+  */
   function Looper(options) {
     this.cursor = -1;
     this.transitionTimeout = null;
@@ -13,8 +16,23 @@ Looper = (function() {
     //  iterate over options and add them to the props?
     options = options || {};
 
+    // aka tick interval === how long
     this.tickDuration = options.tickDuration || 1000;
-    this.loopLength = options.loopLength || 10;
+
+    // abstraction of measures
+    this.innerLoops = options.innerLoops || 1
+    
+    // beats per loop
+    this.loopSections = options.loopSections || 4;
+    
+    // notes per beat
+    this.loopSectionLegnth = options.loopSectionLegnth || 4;
+
+    // loopLenght consists of innerIterations, steps per innerIteration
+    this.loopLength = this.innerLoops * this.loopSections * this.loopSectionLegnth;
+
+    this.addEmitter(options.e)
+
   }
 
   Looper.getInstance = function() {
@@ -25,10 +43,31 @@ Looper = (function() {
     })(this, arguments, function(){});
   };
 
+  Looper.prototype.validateEmitter = function(extEm) {
+    console.log("EEE", extEm);
+    if(!extEm) {
+      this.eventEmitter = false;
+      return {
+        emit: function(event) {
+          console.log('no subscriber for this event: %s', event);
+        }
+      };
+    } else {
+      this.eventEmitter = true;
+      return extEm.e
+    };
+  };
+
+  Looper.prototype.addEmitter = function(em) {
+    console.log("ZZZ",this.validateEmitter(em))
+    this.e = this.validateEmitter(em);
+  }
+
   Looper.prototype.start = function() {
     console.debug('Looper:start()');
     this.looping = true;
     this.tick();
+    this.e.emit('loop:start')
   };
   
   /**
@@ -46,6 +85,7 @@ Looper = (function() {
     if(this.cursor > (this.loopLength - 1)) {
       this.cursor = 0;
     };
+    this.e.emit('loop:tick');
   };
 
   Looper.prototype.stop = function() {
@@ -54,10 +94,12 @@ Looper = (function() {
       this.disarm();
     };
     this.resetCursor();
+    this.e.emit('loop:stop');
   };
 
   Looper.prototype.disarm = function() {
     clearTimeout(this.transitionTimeout);
+
   };
 
   Looper.prototype.resetCursor = function() {
