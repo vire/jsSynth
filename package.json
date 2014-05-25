@@ -1,0 +1,30 @@
+{
+  "name": "jsSynth",
+  "version": "0.0.2",
+  "description": "jsSynth ======= OpenSource subtractive synthetizer/web audio API, written in JavaScript - [Live Example](http://dualsoul.net/tmp/jsSynth/)",
+  "private": true,
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "testem ci -l chrome"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/vire/jsSynth.git"
+  },
+  "keywords": [
+    "javascrip",
+    "synthetizer"
+  ],
+  "author": "recrof",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/vire/jsSynth/issues"
+  },
+  "homepage": "https://github.com/vire/jsSynth",
+  "devDependencies": {
+    "testem": "^0.6.15"
+  }
+}
