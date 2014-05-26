@@ -1,4 +1,4 @@
-UIManager = (function() {
+  UIManager = (function() {
   'use strict';
 
   /**
@@ -16,21 +16,39 @@ UIManager = (function() {
     };
   };
 
-  UIManager.prototype.elementList = function(list) {
-    return {
-      'buttons': {},
-      'tracks': {},
-      'sliders': {}
+  UIManager.prototype.getElementList = function() {
+    return this.elements || {
+      'buttons': [],
+      'channels': [],
+      'knobs': [],
+      'sliders': [],
+      'inputs': []
     }
   };
 
-  UIManager.prototype.drawElement = function() {};
+  UIManager.prototype.setElementList = function(newList) {
+    this.elements = newList;
+  };
+
+  UIManager.prototype.drawElement = function(element, scope) {
+    // create aprop html element for each eleme, 
+    // add classes, add bidnging, and append into apropriate place
+  };
   
   // 
-  UIManager.prototype.updateElement = function() {};
+  UIManager.prototype.updateElement = function(oldElem, newElem) {};
   
   // reaction on the looper tick event
   UIManager.prototype.updateOnTick = function() {};
+
+  UIManager.prototype.renderElements = function(elementList) {
+    var that = this;
+    for(elementgroup in elementList) {
+      elementList[elementgroup].forEach(function(element) {
+        that.drawElement(element, scope);
+      });
+    }
+  }  
 
   return UIManager;
 })();

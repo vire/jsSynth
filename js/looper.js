@@ -2,7 +2,6 @@
 * Looper class, responsible for iteration and sequence logic.
 * Heavily inspired by the {@link https://github.com/michd/step-sequencer/blob/master/assets/js/tempo.js}
 */
-
 Looper = (function() {
   'use strict';
   Looper.instance = null;
