@@ -14,7 +14,6 @@ describe('UIManager', function() {
 
   it('should contain elements in a element list property', function() {
     var elemList = uimanager.getElementList();
-    console.log('uimanager.elementList', elemList.hasOwnProperty('buttons'))
     expect(elemList).not.toBe({});
     expect(elemList).toBeDefined();
 

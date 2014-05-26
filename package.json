@@ -8,7 +8,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "testem ci -l chrome"
+    "test": "testem ci"
   },
   "repository": {
     "type": "git",

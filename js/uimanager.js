@@ -12,6 +12,9 @@
     this.e = options.e || {
       emit: function() {
         throw new Error('no event emitter!');
+      },
+      listenTo: {
+        'looper:tick': this.updateOnTick
       }
     };
   };
@@ -39,7 +42,7 @@
   UIManager.prototype.updateElement = function(oldElem, newElem) {};
   
   // reaction on the looper tick event
-  UIManager.prototype.updateOnTick = function() {};
+  UIManager.prototype.updateOnTick = function(loopCursor) {};
 
   UIManager.prototype.renderElements = function(elementList) {
     var that = this;
