@@ -21,8 +21,10 @@ OpenSource subtractive synthetizer/web audio API, written in JavaScript - [Live 
 
 This project is currently dependendent on the following 3rd party libraries:
 
+* [jquery](https://github.com/jquery/jquery/) - MIT
 * [jquery-tmpl](https://github.com/BorisMoore/jquery-tmpl) - Dual licensed under the MIT or GPL Version 2 licenses.
-* [qwerty-hancock](https://github.com/stuartmemo/qwerty-hancock) - MIT  
+* [qwerty-hancock](https://github.com/stuartmemo/qwerty-hancock) - MIT
+* [Q - asynchronous promises](https://github.com/kriskowal/q) - MIT
 
 ## License
 
