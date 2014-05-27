@@ -4,7 +4,7 @@
 */
 Looper = (function() {
   'use strict';
-  Looper.instance = null;
+  Looper._instance = null;
 
   /**
   * @Constructor

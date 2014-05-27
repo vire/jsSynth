@@ -1,6 +1,6 @@
-  UIManager = (function() {
+UIManager = (function() {
   'use strict';
-
+  
   /**
   * @constructor UIManager
   * Stores list of elements, listens on their events, updates them, 
@@ -8,6 +8,8 @@
   */
   function UIManager(options) {
     options = options || {};
+    this.rootContainer = options.rootContainer;
+    this.uiContainer = options.uiContainer;
     this.eventId = 'uiman';
     this.e = options.e || {
       emit: function() {
@@ -17,6 +19,18 @@
         'looper:tick': this.updateOnTick
       }
     };
+    this.initialize();
+  };
+
+  UIManager.instance = null;
+
+  UIManager.getInstance = function() {
+    return this._instance != null ? this._instance : this._instance = (
+      function(func, args, ctor) {
+        ctor.prototype = func.prototype;
+        var child = new ctor, result = func.apply(child, args);
+        return Object(result) === result ? result : child;
+      })(this, arguments, function(){});
   };
 
   UIManager.prototype.getElementList = function() {
@@ -27,6 +41,12 @@
       'sliders': [],
       'inputs': []
     }
+  };
+
+  UIManager.prototype.initialize = function() {
+    var rootElement = document.createElement('div');
+    rootElement.id = this.uiContainer;
+    $("#" + this.rootContainer).append(rootElement)
   };
 
   UIManager.prototype.setElementList = function(newList) {
