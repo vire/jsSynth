@@ -1,3 +1,5 @@
+/* globals  $ */
+
 UIManager = (function() {
   'use strict';
   
@@ -8,19 +10,20 @@ UIManager = (function() {
   */
   function UIManager(options) {
     options = options || {};
-    this.rootContainer = options.rootContainer;
-    this.uiContainer = options.uiContainer;
+    this.rootContainerId = options.rootContainerId;
+    this.uiContainerId = options.uiContainerId;
     this.eventId = 'uiman';
     this.e = options.e || {
-      emit: function() {
-        throw new Error('no event emitter!');
+      // stub method
+      trigger: function(param) {
+        throw new Error('event ' + param  + ' not processed!');
       },
       listenTo: {
         'looper:tick': this.updateOnTick
       }
     };
     this.initialize();
-  };
+  }
 
   UIManager.instance = null;
 
@@ -40,22 +43,79 @@ UIManager = (function() {
       'knobs': [],
       'sliders': [],
       'inputs': []
-    }
+    };
   };
 
   UIManager.prototype.initialize = function() {
-    var rootElement = document.createElement('div');
-    rootElement.id = this.uiContainer;
-    $("#" + this.rootContainer).append(rootElement)
+    this.uiContainer = $('<div id=' + this.uiContainerId + '></div>')
+    .appendTo( $('#' + this.rootContainerId));
+
+    this.drawElement({
+      tagName:'button',
+      className :'seq-play-button',
+      label: 'Play',
+      eventType: 'click',
+      emit: 'play',
+      css: {},
+      toggle: {
+        toggleOn: 'click',
+        className: 'seq-pause-button',
+        label: 'Pause',
+        emit: 'pause',
+        css: {}
+      }      
+    }, this);
+
+    this.drawElement({
+          tagName:'button',
+          className :'seq-stop-button',
+          label: 'Stop',
+          eventType: 'click',
+          emit: 'stop',
+          css: {}
+        }, this);
   };
 
   UIManager.prototype.setElementList = function(newList) {
     this.elements = newList;
   };
 
-  UIManager.prototype.drawElement = function(element, scope) {
+  UIManager.prototype.drawElement = function(el, scope) {
+
+    // TODO this is for testing only (daw element will be called from elswhere)
+    scope = scope || this;
+
     // create aprop html element for each eleme, 
     // add classes, add bidnging, and append into apropriate place
+
+    var className, elemId, emit, tagName, label, eventType, parentElem, handler;
+    className = el.className || '';
+    elemId = el.elemId || '';
+    tagName = el.tagName || 'div' ;
+    label = el.label || '<no label provided>';
+    emit = el.emit || '';
+    parentElem = el.parent || this.uiContainer;
+    eventType = el.eventType || 'click';
+    
+    var xxx = '<' + tagName+ ' id="' + elemId+'" class="' + className + '" >' + label + '</' + tagName + '>';
+    
+    if(!el.toggle) {
+      handler = function() {
+        scope.e.trigger('uiman:'+ emit);
+      };
+    } else {
+      handler = function() {
+        if( $(this).text() === label) {
+          $(this).text(el.toggle.label);
+          scope.e.trigger('uiman:' + emit);
+        } else {
+          $(this).text(label);
+          scope.e.trigger('uiman:' + el.toggle.emit);
+        }
+      };
+    }
+
+    $(xxx).on(eventType, handler).appendTo(parentElem);
   };
   
   // 
@@ -64,7 +124,7 @@ UIManager = (function() {
   // reaction on the looper tick event
   UIManager.prototype.updateOnTick = function(loopCursor) {};
 
-  UIManager.prototype.renderElements = function(elementList) {
+  UIManager.prototype.renderElements = function(elementList, scope) {
     var that = this;
     for(elementgroup in elementList) {
       elementList[elementgroup].forEach(function(element) {
