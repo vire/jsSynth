@@ -1,5 +1,14 @@
 /* globals  $ */
 
+  /** 
+  * TODOs: 
+  * - P1 - replace drawElement with newDrawElement method, check tests and rename back
+  * - add listener for `uiman:stop` event - restore the ui to the initial state
+  * - add listener for `uiman:play` event - swap the play button to pause  
+  * - add listener for `uiman:pause` event - swap the pause button back to play
+  * - add listener for `looper:play` event - to start animating the channel  
+  */
+
 UIManager = (function() {
   'use strict';
   
@@ -15,10 +24,12 @@ UIManager = (function() {
     this.eventId = 'uiman';
     this.e = options.e || {
       // stub method
-      trigger: function(param) {
-        throw new Error('event ' + param  + ' not processed!');
+      emit: function(param) {
+        console.log(param)
       },
       listenTo: {
+        'uiman:toggle:pause' : this.toggleToPause,
+        'uiman:toggle:play' : this.toggleToPlay,
         'looper:tick': this.updateOnTick
       }
     };
@@ -38,46 +49,72 @@ UIManager = (function() {
 
   UIManager.prototype.getElementList = function() {
     return this.elements || {
-      'buttons': [],
-      'channels': [],
-      'knobs': [],
-      'sliders': [],
+      'buttons': {
+        'play' : {
+          'class': 'seq-play-button',
+          tagName: 'button',
+          label: 'Play',
+          jqEvent: 'click',
+          // component:event or component:toggle:forevent
+          // toggles the button play to pause
+          emitEvents: ['uiman:play','uiman:toggle:pause']
+        },
+        'pause' :{
+          'class': 'seq-pause-button',
+          tagName: 'button',
+          label: 'Pause',
+          jqEvent: 'click',
+          emitEvents: ['uiman:pause','uiman:toggle:play']
+        },
+        'stop': {
+          'class': 'seq-stop-button',
+          tagName: 'button',
+          label: 'Stop',
+          jqEvent: 'click',
+          emitEvents: ['uiman:stop']
+        }
+      },
+      'channels': {},
+      'knobs': {},
+      'sliders': {},
       'inputs': []
     };
   };
 
+
   UIManager.prototype.initialize = function() {
     this.uiContainer = $('<div id=' + this.uiContainerId + '></div>')
     .appendTo( $('#' + this.rootContainerId));
+    var elemList = this.getElementList();
 
-    this.drawElement({
-      tagName:'button',
-      className :'seq-play-button',
-      label: 'Play',
-      eventType: 'click',
-      emit: 'play',
-      css: {},
-      toggle: {
-        toggleOn: 'click',
-        className: 'seq-pause-button',
-        label: 'Pause',
-        emit: 'pause',
-        css: {}
-      }      
-    }, this);
-
-    this.drawElement({
-          tagName:'button',
-          className :'seq-stop-button',
-          label: 'Stop',
-          eventType: 'click',
-          emit: 'stop',
-          css: {}
-        }, this);
+    this.newDrawElement(elemList['buttons']['play'], this)
+    this.newDrawElement(elemList['buttons']['stop'], this)
   };
 
   UIManager.prototype.setElementList = function(newList) {
     this.elements = newList;
+  };
+
+  UIManager.prototype.newDrawElement = function(el, scope) {
+    var className, identifier,handler, emitEvents, label, jqEvent, tagName, parentElem;
+    scope = scope || this;
+    identifier = el.identifier || '';
+    className = el.class || '';
+    tagName = el.tagName || 'div';
+    label = el.label || 'no-label';
+    jqEvent = el.jqEvent || 'click';
+    emitEvents = el.emitEvents || 'uiman:fallback';
+    parentElem = el.parentElem || this.uiContainer;
+    handler = function() {
+      emitEvents.forEach(function(ev) {
+        scope.e.emit(ev);
+      });
+    };
+    var newElement = '<' + tagName +
+      ' id="' + identifier + 
+      '" class="' + className + 
+      '" >' + label + '</' + tagName + '>';
+    $(newElement).on(jqEvent, handler).appendTo(parentElem);
   };
 
   UIManager.prototype.drawElement = function(el, scope) {
@@ -101,16 +138,16 @@ UIManager = (function() {
     
     if(!el.toggle) {
       handler = function() {
-        scope.e.trigger('uiman:'+ emit);
+        scope.e.emit('uiman:'+ emit);
       };
     } else {
       handler = function() {
         if( $(this).text() === label) {
           $(this).text(el.toggle.label);
-          scope.e.trigger('uiman:' + emit);
+          scope.e.emit('uiman:' + emit);
         } else {
           $(this).text(label);
-          scope.e.trigger('uiman:' + el.toggle.emit);
+          scope.e.emit('uiman:' + el.toggle.emit);
         }
       };
     }

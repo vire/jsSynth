@@ -93,13 +93,10 @@ describe('UIManager', function() {
     expect(drawnButton).toBeDefined();
     expect(drawnButton.text()).toMatch('Play');
     // just a workaround cause the uimanager.eventer isn't impl yet
-    try {
-      drawnButton.click()
-    } catch(e) {
-      expect(e).toMatch('uiman:play not processed!')
-    }
+    drawnButton.click()
     expect(drawnButton.text()).toMatch('Pause');
-  })
+  });
+  
   it('should contain elements in a element list property', function() {
     var elemList = uimanager.getElementList();
     expect(elemList).not.toBe({});
@@ -112,4 +109,24 @@ describe('UIManager', function() {
     expect(elemList.hasOwnProperty('sliders')).toBeTruthy();
     expect(elemList.hasOwnProperty('inputs')).toBeTruthy();
   });
+
+  it('should have an newDrawElement() mehtod for adding elements', function() {
+    var uic = $('#'+opts.uiContainerId);
+    var playButton = {
+      'class': 'seq-play-button',
+      tagName: 'button',
+      label: 'Play',
+      jqEvent: 'click',
+      // component:event or component:toggle:forevent
+      emitEvents: ['uiman:play','uiman:toggle:pause']
+    };
+    spyOn(uimanager, 'newDrawElement').and.callThrough();
+    uic.empty();
+    uimanager.newDrawElement(playButton);
+    expect(uic.children().length).toBe(1);
+    var drawnButton = uic.find('button');
+    expect(drawnButton).toBeDefined();
+    expect(drawnButton.text()).toMatch('Play');
+    
+  })
 });
