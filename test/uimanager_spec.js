@@ -7,9 +7,11 @@ var opts = {
   rootContainerId: 'sequencer-test-container',
   uiContainerId: 'ui-container'
 };
-
+var uic;
 var uimanager = UIManager.getInstance(opts);
 var rootContainer = $('#'+opts.uiContainerId);
+var elemList = uimanager.getElementList();
+
 
 describe('UIManager', function() {
 
@@ -45,58 +47,6 @@ describe('UIManager', function() {
     expect(rootContainer.find('.seq-stop-button')[0]).toBeDefined();
   });
 
-  it('.drawElement() a simple(non-toggle) button' , function() {
-    
-    var simplebutton = {
-      tagName:'button',
-      className :'seq-stop-button',
-      label: 'Stop',
-      eventType: 'click',
-      emit: 'stop',
-    };
-
-    spyOn(uimanager, 'drawElement').and.callThrough();
-    // remove the buttons first
-    var uic = $('#'+opts.uiContainerId);
-    uic.empty();
-
-    expect(uic.children().length).toBe(0);
-    uimanager.drawElement(simplebutton);
-    expect(uic.children().length).toBe(1);
-    expect(uimanager.drawElement).toHaveBeenCalled();
-
-  });
-
-  it('.drawElement() should add a toggle button to the `uiContainer`', function() {
-    var toggleButton = {
-      tagName:'button',
-      className :'seq-play-button',
-      label: 'Play',
-      eventType: 'click',
-      emit: 'play',
-      css: {},
-      toggle: {
-        toggleOn: 'click',
-        className: 'seq-pause-button',
-        label: 'Pause',
-        emit: 'pause',
-        css: {}
-      }  
-    }
-    spyOn(uimanager, 'drawElement').and.callThrough();
-    // remove the buttons first
-    var uic = $('#'+opts.uiContainerId);
-    uic.empty();
-    uimanager.drawElement(toggleButton);
-    expect(uic.children().length).toBe(1);
-    var drawnButton = uic.find('button');
-    expect(drawnButton).toBeDefined();
-    expect(drawnButton.text()).toMatch('Play');
-    // just a workaround cause the uimanager.eventer isn't impl yet
-    drawnButton.click()
-    expect(drawnButton.text()).toMatch('Pause');
-  });
-  
   it('should contain elements in a element list property', function() {
     var elemList = uimanager.getElementList();
     expect(elemList).not.toBe({});
@@ -110,23 +60,54 @@ describe('UIManager', function() {
     expect(elemList.hasOwnProperty('inputs')).toBeTruthy();
   });
 
-  it('should have an newDrawElement() mehtod for adding elements', function() {
-    var uic = $('#'+opts.uiContainerId);
-    var playButton = {
-      'class': 'seq-play-button',
-      tagName: 'button',
-      label: 'Play',
-      jqEvent: 'click',
-      // component:event or component:toggle:forevent
-      emitEvents: ['uiman:play','uiman:toggle:pause']
-    };
-    spyOn(uimanager, 'newDrawElement').and.callThrough();
-    uic.empty();
-    uimanager.newDrawElement(playButton);
-    expect(uic.children().length).toBe(1);
-    var drawnButton = uic.find('button');
-    expect(drawnButton).toBeDefined();
-    expect(drawnButton.text()).toMatch('Play');
+  describe('.drawElement() method ', function() {
+    uic = $('#'+opts.uiContainerId);
     
-  })
+    beforeEach(function() {
+      spyOn(uimanager, 'drawElement').and.callThrough();
+      spyOn(uimanager.e, 'emit');
+      uic.empty();
+    });
+    afterEach(function() {
+      uic.empty();
+    });
+    
+    it('should thow error without if no params provided', function() {
+      var err = null;
+      try {
+        uimanager.drawElement();
+      } catch (e) {
+        err = e;
+      }
+      expect(uimanager.drawElement).toHaveBeenCalled();
+      expect(err).toMatch('no element for add provided!');
+    });
+    it('should append one elem into a container' ,function() {
+      expect(uic.children().length).toBe(0);
+      uimanager.drawElement(elemList.buttons.play);
+      expect(uic.children().length).toBe(1);
+    });
+    it('should proper append an button', function() {
+      uimanager.drawElement(elemList.buttons.play);
+      var drawnButton = uic.find('button');
+      expect(drawnButton.text()).toMatch('Play');
+      expect(drawnButton.attr('class')).toMatch('seq-play-button')
+    })
+    it('should process the input - add event handler, and emit', function() {
+      uimanager.drawElement(elemList.buttons.play);
+      var drawnButton = uic.find('button');
+      drawnButton.click();
+      expect(uimanager.e.emit).toHaveBeenCalled();
+    });
+    it('should add more than 1 elements to container', function() {
+      uimanager.drawElement(elemList.buttons.play);
+      uimanager.drawElement(elemList.buttons.pause);
+      uimanager.drawElement(elemList.buttons.stop);
+      expect(uic.children().length).toBe(3);
+      var drawnButtons = uic.find('button');
+      expect(drawnButtons.eq(0).text()).toMatch('Play');
+      expect(drawnButtons.eq(1).text()).toMatch('Pause');
+      expect(drawnButtons.eq(2).text()).toMatch('Stop');
+    });
+  });  
 });
