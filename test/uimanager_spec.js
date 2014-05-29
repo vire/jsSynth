@@ -12,53 +12,57 @@ var uimanager = UIManager.getInstance(opts);
 var rootContainer = $('#'+opts.uiContainerId);
 var elemList = uimanager.getElementList();
 
-
 describe('UIManager', function() {
 
-  beforeEach(function() {
-  });
-  
-  it('needs jquery', function() {
-    expect($).toBeDefined();
-  });
-  it('should be defined on global', function() {
-    expect(UIManager).toBeDefined();
-    expect(UIManager.prototype.constructor.name).toEqual('UIManager');
-  });
-  it('should return an instance', function() {
-    expect(uimanager).toBeDefined();
-  });
+  describe('core functionality', function() {
+    it('should be defined on global', function() {
+      expect(UIManager).toBeDefined();
+      expect(UIManager.prototype.constructor.name).toEqual('UIManager');
+    });
+    it('relies on jquery', function() {
+      it('needs jquery', function() {
+        expect($).toBeDefined();
+      });    
+    });
+    it('should allow .getInstance() returning a singleton instance', 
+      function() {
+        var anotherUIManager = UIManager.getInstance();
+        expect(uimanager).toBeDefined();
+        expect(UIManager === UIManager).toBeTruthy();
+      }
+    );
+    it('must contain its `uiContainerId` ', function() {
+      expect(uimanager.uiContainerId).toBeDefined();
+      expect(uimanager.uiContainerId).toMatch('ui-container');
+    });
+    it('must contain an `uiContainer` property' ,function() {
+      expect(uimanager.uiContainer).toBeDefined();
+    });
+    it('should contain elements in a element list property', function() {
+      var elemList = uimanager.getElementList();
+      expect(elemList).not.toBe({});
+      expect(elemList).toBeDefined();
 
-  it('must contain an `uiContainer` property' ,function() {
-    expect(uimanager.uiContainer).toBeDefined();
-  })
-
-  it('must contain its `uiContainerId` ', function() {
-    expect(uimanager.uiContainerId).toBeDefined();
-    expect(uimanager.uiContainerId).toMatch('ui-container');
-  });
-
-  it('has .initialize() which appends `uiContainerId` onto DOM', function() {
-    expect($('#'+opts.uiContainerId).length).not.toBe(0);
-  });
-
-  it('should add play stop buttons to this container', function() {
-    expect(rootContainer.find('.seq-play-button')[0]).toBeDefined();
-    expect(rootContainer.find('.seq-stop-button')[0]).toBeDefined();
-  });
-
-  it('should contain elements in a element list property', function() {
-    var elemList = uimanager.getElementList();
-    expect(elemList).not.toBe({});
-    expect(elemList).toBeDefined();
-
-    // Dummy properties
-    expect(elemList.hasOwnProperty('buttons')).toBeTruthy();
-    expect(elemList.hasOwnProperty('channels')).toBeTruthy();
-    expect(elemList.hasOwnProperty('knobs')).toBeTruthy();
-    expect(elemList.hasOwnProperty('sliders')).toBeTruthy();
-    expect(elemList.hasOwnProperty('inputs')).toBeTruthy();
-  });
+      // Dummy properties
+      expect(elemList.hasOwnProperty('buttons')).toBeTruthy();
+      expect(elemList.hasOwnProperty('channels')).toBeTruthy();
+      expect(elemList.hasOwnProperty('knobs')).toBeTruthy();
+      expect(elemList.hasOwnProperty('sliders')).toBeTruthy();
+      expect(elemList.hasOwnProperty('inputs')).toBeTruthy();
+    });
+    
+    it('.initialize() appends uicontainer to DOM',
+      function() {
+        var rootContainer = $('#'+opts.rootContainerId)
+        var uicontainer = rootContainer.find('#'+opts.uiContainerId);
+        expect(rootContainer.children().length).not.toBe(0);
+        expect(uicontainer.children().length).not.toBe(0);
+      });
+    it('.initialize() will draw basic `buttons`', function() {
+      expect(rootContainer.find('.seq-play-button')[0]).toBeDefined();
+      expect(rootContainer.find('.seq-stop-button')[0]).toBeDefined();
+    });   
+  });  
 
   describe('.drawElement() method ', function() {
     uic = $('#'+opts.uiContainerId);

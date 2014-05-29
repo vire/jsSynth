@@ -18,8 +18,8 @@ UIManager = (function() {
   * propagates events to other ui components.
   */
   function UIManager(options) {
-    options = options || {};
     var that = this;
+    options = options || {};
     this.rootContainerId = options.rootContainerId;
     this.uiContainerId = options.uiContainerId;
     this.eventId = 'uiman';
@@ -124,12 +124,14 @@ UIManager = (function() {
  
   // 
   UIManager.prototype.updateElement = function(oldElem, newElem) {};
-  
   // reaction on the looper tick event
   UIManager.prototype.updateOnTick = function(loopCursor) {};
 
   UIManager.prototype.renderElements = function(elementList, scope) {
     var that = this;
+
+    elementList = elementList ||  this.getElementList();
+    
     for(elementgroup in elementList) {
       elementList[elementgroup].forEach(function(element) {
         that.drawElement(element, scope);
