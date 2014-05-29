@@ -23,7 +23,7 @@ UIManager = (function() {
     this.rootContainerId = options.rootContainerId;
     this.uiContainerId = options.uiContainerId;
     this.channelContainerId = options.channelContainerId || 
-    'seq-channel-container' 
+    'seq-channel-container';
     this.eventId = 'uiman';
     this.e = options.e || {
       // stub method
@@ -102,14 +102,15 @@ UIManager = (function() {
       background: 'red',
       width: '400px',
       height: '150px'
-    }
+    };
+
     this.uiContainer.append($('<div id=' + this.channelContainerId +
-     '>').css(channelContainer))
+     '>').css(channelContainer));
     
     var elemList = this.getElementList();
 
 
-    this.drawElements(elemList)
+    this.drawElements(elemList);
   };
 
   UIManager.prototype.setElementList = function(newList) {
@@ -119,7 +120,7 @@ UIManager = (function() {
   UIManager.prototype.drawElement = function(el, scope) {
     var className, identifier,handler, emitEvents, label, jqEvent, tagName, parentElem;
     if(!el) {
-      throw new Error('no element for add provided!')
+      throw new Error('no element for add provided!');
     }
     scope = scope || this;
     identifier = el.identifier || '';
@@ -158,13 +159,13 @@ UIManager = (function() {
           // iterate through items and draw tem to the UI : )
           for(var setOfElems in items) {
             if(items.hasOwnProperty(setOfElems)) {
-              this.drawElement(items[setOfElems], this)
+              this.drawElement(items[setOfElems], this);
             }
-          }          
+          }
         }
       }
     }
-  }  
+  };
 
   return UIManager;
 })();
