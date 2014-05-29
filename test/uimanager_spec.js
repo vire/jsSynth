@@ -64,7 +64,7 @@ describe('UIManager', function() {
     });   
   });  
 
-  describe('.drawElement() method ', function() {
+  xdescribe('.drawElement() method ', function() {
     uic = $('#'+opts.uiContainerId);
     
     beforeEach(function() {

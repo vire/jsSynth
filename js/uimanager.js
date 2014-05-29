@@ -22,6 +22,8 @@ UIManager = (function() {
     options = options || {};
     this.rootContainerId = options.rootContainerId;
     this.uiContainerId = options.uiContainerId;
+    this.channelContainerId = options.channelContainerId || 
+    'seq-channel-container' 
     this.eventId = 'uiman';
     this.e = options.e || {
       // stub method
@@ -76,21 +78,38 @@ UIManager = (function() {
           emitEvents: ['uiman:stop']
         }
       },
-      'channels': {},
+      'channels': {
+        '00' : {
+          'class' : 'seq-channel',
+          'tagName' : 'div',
+          'content' : {},
+          'parentElem' : '#seq-channel-container'
+        }
+      },
       'knobs': {},
       'sliders': {},
-      'inputs': []
+      'inputs': {}
     };
   };
 
 
   UIManager.prototype.initialize = function() {
-    this.uiContainer = $('<div id=' + this.uiContainerId + '></div>')
-    .appendTo( $('#' + this.rootContainerId));
+    this.uiContainer = $('<div id=' + this.uiContainerId + '></div>');
+
+    this.uiContainer.appendTo( $('#' + this.rootContainerId));
+
+    var channelContainer = {
+      background: 'red',
+      width: '400px',
+      height: '150px'
+    }
+    this.uiContainer.append($('<div id=' + this.channelContainerId +
+     '>').css(channelContainer))
+    
     var elemList = this.getElementList();
 
-    this.drawElement(elemList['buttons']['play'], this);
-    this.drawElement(elemList['buttons']['stop'], this);
+
+    this.drawElements(elemList)
   };
 
   UIManager.prototype.setElementList = function(newList) {
@@ -127,15 +146,23 @@ UIManager = (function() {
   // reaction on the looper tick event
   UIManager.prototype.updateOnTick = function(loopCursor) {};
 
-  UIManager.prototype.renderElements = function(elementList, scope) {
+  UIManager.prototype.drawElements = function(elementList) {
     var that = this;
 
     elementList = elementList ||  this.getElementList();
     
-    for(elementgroup in elementList) {
-      elementList[elementgroup].forEach(function(element) {
-        that.drawElement(element, scope);
-      });
+    for(var elementgroup in elementList) {
+      if(elementList.hasOwnProperty(elementgroup)) {
+        var items = elementList[elementgroup];
+        if(0 !== Object.keys(items).length) {
+          // iterate through items and draw tem to the UI : )
+          for(var setOfElems in items) {
+            if(items.hasOwnProperty(setOfElems)) {
+              this.drawElement(items[setOfElems], this)
+            }
+          }          
+        }
+      }
     }
   }  
 
