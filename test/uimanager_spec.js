@@ -64,13 +64,13 @@ describe('UIManager', function() {
     });   
   });  
 
-  xdescribe('.drawElement() method ', function() {
+  describe('.drawElement() method ', function() {
     uic = $('#'+opts.uiContainerId);
     
     beforeEach(function() {
       spyOn(uimanager, 'drawElement').and.callThrough();
       spyOn(uimanager.e, 'emit');
-      uic.empty();
+      
     });
     afterEach(function() {
       uic.empty();
@@ -113,5 +113,62 @@ describe('UIManager', function() {
       expect(drawnButtons.eq(1).text()).toMatch('Pause');
       expect(drawnButtons.eq(2).text()).toMatch('Stop');
     });
-  });  
+  });
+
+  describe('.drawElements() method', function() {
+    var container = uimanager.uiContainer;
+    var sampleList = {
+      "category1" : {
+        'play' : {
+          'class': 'seq-test-button',
+          tagName: 'button',
+          label: 'Test paly',
+          jqEvent: 'click',
+          // component:event or component:toggle:forevent
+          // toggles the button play to pause
+          emitEvents: ['uiman:play']
+        },
+      }
+    }
+
+    beforeEach(function() {
+      
+      spyOn(uimanager, 'drawElements').and.callThrough();
+      spyOn(uimanager, 'drawElement').and.callThrough();
+      spyOn(uimanager.e, 'emit');
+      
+    });
+    afterEach(function() {
+      container.empty();
+    })
+
+    it('accepts no params - renders the default elementList', function() {
+      expect(uimanager.drawElements).not.toHaveBeenCalled();
+      uimanager.drawElements();
+      expect(uimanager.drawElements).toHaveBeenCalled();
+      expect(uimanager.drawElement).toHaveBeenCalled();
+      expect(uimanager.uiContainer.children().length).not.toBe(0)
+    });
+
+    it('accepts an empty list param - renders nothing', function() {
+      expect(uimanager.drawElements).not.toHaveBeenCalled();
+      uimanager.drawElements({});
+      expect(uimanager.drawElements).toHaveBeenCalled();
+      expect(uimanager.drawElement).not.toHaveBeenCalled();
+      expect(uimanager.uiContainer.children().length).toBe(0)
+    });
+
+    it('accepts an object with items to be rendered', function() {
+      var elem = null;
+      expect(uimanager.drawElements).not.toHaveBeenCalled();
+      uimanager.drawElements(sampleList);
+      expect(uimanager.drawElement).toHaveBeenCalled();
+      expect(uimanager.drawElements).toHaveBeenCalled();
+      elem = uimanager.uiContainer.find('button');
+      expect(uimanager.uiContainer.children().length).not.toBe(0);
+      expect(elem).toBeDefined();
+      elem.click();
+      expect(uimanager.e.emit).toHaveBeenCalled();
+    })
+  }); 
 });

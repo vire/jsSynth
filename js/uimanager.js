@@ -151,7 +151,7 @@ UIManager = (function() {
     var that = this;
 
     elementList = elementList ||  this.getElementList();
-    
+
     for(var elementgroup in elementList) {
       if(elementList.hasOwnProperty(elementgroup)) {
         var items = elementList[elementgroup];
