@@ -88,7 +88,12 @@ UIManager = (function() {
       },
       'knobs': {},
       'sliders': {},
-      'inputs': {}
+      'inputs': {},
+      'containers': {
+        'channel-container': {
+          
+        }
+      }
     };
   };
 
