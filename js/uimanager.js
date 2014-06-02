@@ -25,7 +25,7 @@ UIManager = (function() {
     this.channelContainerId = options.channelContainerId || 
       'seq-channel-container';
     this.eventId = 'uiman';
-
+    this.defaultChannelCount = 4;
     this.rootContainer = $('#'+ this.rootContainerId);
     
     this.e = options.e || {
@@ -96,22 +96,10 @@ UIManager = (function() {
           emitEvents: ['uiman:stop']
         }
       },
-      'channels': {
-        '00' : {
-          'class' : 'seq-channel',
-          'tagName' : 'div',
-          'content' : {},
-          'parentElem' : '#seq-channel-container'
-        }
-      },
       'knobs': {},
       'sliders': {},
       'inputs': {},
-      'containers': {
-        'channel-container': {
-          
-        }
-      }
+      'containers': {},
     };
   };
 
@@ -137,6 +125,7 @@ UIManager = (function() {
 
     var elemList = this.getElementList();
     this.drawElements(elemList);
+    this.drawChannels();
   };
 
   /**
@@ -146,6 +135,9 @@ UIManager = (function() {
    */
   UIManager.prototype.drawElement = function(el, scope) {
     var className, identifier,handler, emitEvents, label, jqEvent, tagName, parentElem;
+    
+
+
     if(!el) {
       throw new Error('no element for add provided!');
     }
@@ -164,7 +156,7 @@ UIManager = (function() {
      */
     handler = function() {
       emitEvents.forEach(function(ev) {
-        scope.e.emit(ev);
+        scope.em.emit(ev);
       });
     };
     
@@ -189,11 +181,17 @@ UIManager = (function() {
   UIManager.prototype.drawElements = function(elementList) {
     var that = this;
 
+
     elementList = elementList ||  this.getElementList();
 
     for(var elementgroup in elementList) {
       if(elementList.hasOwnProperty(elementgroup)) {
         var items = elementList[elementgroup];
+
+        if('channels' === elementgroup) {
+          this.drawChannels(elementList[elementgroup]);
+        }
+
         if(0 !== Object.keys(items).length) {
           // iterate through items and draw tem to the UI : )
           for(var setOfElems in items) {
@@ -205,6 +203,33 @@ UIManager = (function() {
       }
     }
   };
+
+  UIManager.prototype.drawChannels = function() {
+    // default channelCount can be easily overridden
+    var chCnt = this.defaultChannelCount;
+    var patternSegments = 4 // Looper.loopSections ~ beats per loop
+    var segmentItems = 4 // Looper.loopSectionLegnth ~ notes per beat
+    var i, j, k;
+
+    var controlsStyle = 'style=\'height: 30px;background: white; width: 30%;border-bottom: 1px solid;float: left;\''
+    var patternStyle = 'style=\'height: 30px;background: wheat; width: 70%;border-bottom: 1px solid;float: left;\''
+    for(i = 0; i < chCnt; i +=1) {
+      var channelTemplate = $('<div class=\'seq-channel-0'+ i +'\'>' + 
+        '<div ' + controlsStyle + ' class=\'channel-controls\'></div>' + 
+        '<div ' + patternStyle + ' class=\'channel-pattern\'></div></div>');
+      
+      
+      this.channelContainer.append(channelTemplate);
+    }
+
+    for(j = 0; j < patternSegments; j +=1) {
+      $('.channel-pattern').append($('<div class=\'pattern-segment\'>'))
+    }
+
+    for(k = 0; k < segmentItems; k += 1) {
+      $('.pattern-segment').append($('<div class=\'segment-item\'>'))
+    }
+  }
 
   return UIManager;
 })();

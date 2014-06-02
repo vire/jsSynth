@@ -23,7 +23,6 @@ EventManager = (function() {
         ctor.prototype = func.prototype;
         var param = [{iw: true}].concat(Array.prototype.slice.call(args, 0))
         var child = new ctor, result = func.apply(child, param);
-        console.log("args", param)
         return Object(result) === result ? result : child;
       })(this, arguments, function(){});
   }
