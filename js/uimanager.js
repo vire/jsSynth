@@ -1,22 +1,22 @@
 /* globals  $ */
 
-  /** 
-  * TODOs: 
-  * - add listener for `uiman:stop` event - restore the ui to the initial state
-  * - add listener for `uiman:play` event - swap the play button to pause  
-  * - add listener for `uiman:pause` event - swap the pause button back to play
-  * - add listener for `looper:play` event - to start animating the channel  
-  * - add setElementList
-  */
-
+/**
+* @class - responsible for drawing/rendering items from element list property 
+* into DOM elements, attaching event handlers, subscribing to events. 
+*
+* TODOs: 
+* - add listener for `uiman:stop` event - restore the ui to the initial state
+* - add listener for `uiman:play` event - swap the play button to pause  
+* - add listener for `uiman:pause` event - swap the pause button back to play
+* - add listener for `looper:play` event - to start animating the channel  
+* - add setElementList
+*/
 UIManager = (function() {
   'use strict';
   
   /**
-  * @constructor UIManager
-  * Stores list of elements, listens on their events, updates them, 
-  * propagates events to other ui components.
-  */
+   * @param {Object} options
+   */
   function UIManager(options) {
     var that = this;
     options = options || {};
@@ -39,8 +39,12 @@ UIManager = (function() {
 
   UIManager.instance = null;
 
+  /**
+   * @method UIManager.getInstance - static method for instantiation.
+   * @return {Object}
+   */
   UIManager.getInstance = function() {
-    return this._instance != null ? this._instance : this._instance = (
+    return this.instance != null ? this.instance : this.instance = (
       function(func, args, ctor) {
         ctor.prototype = func.prototype;
         var child = new ctor, result = func.apply(child, args);
@@ -48,9 +52,18 @@ UIManager = (function() {
       })(this, arguments, function(){});
   };
 
-  // TODO
-  UIManager.prototype.setElementList = function() {};
+  /**
+   * @method UIManager#setElementList
+   * @return {Object}
+   */
+  UIManager.prototype.setElementList = function(newList) {
+    this.elements = newList;
+  };
 
+  /**
+   * @method UIManager#getElementList
+   * @return {Object}
+   */
   UIManager.prototype.getElementList = function() {
     return this.elements || {
       'buttons': {
@@ -97,10 +110,15 @@ UIManager = (function() {
     };
   };
 
-
+  /**
+   * Obtains EventManager instance, create uiContainer element and 
+   * appends it to the Application root container, draws elements from the 
+   * element list property.
+   * @method UIManager#initialize 
+   */
   UIManager.prototype.initialize = function() {
+    this.em =  EventManager.getInstance();
     this.uiContainer = $('<div id=' + this.uiContainerId + '></div>');
-
     this.uiContainer.appendTo( $('#' + this.rootContainerId));
 
     var channelContainer = {
@@ -113,15 +131,14 @@ UIManager = (function() {
      '>').css(channelContainer));
     
     var elemList = this.getElementList();
-
-
     this.drawElements(elemList);
   };
 
-  UIManager.prototype.setElementList = function(newList) {
-    this.elements = newList;
-  };
-
+  /**
+   * @method UIManager#drawElement - jqueryize elements
+   * @param  {Object} el
+   * @param  {Object} scope
+   */
   UIManager.prototype.drawElement = function(el, scope) {
     var className, identifier,handler, emitEvents, label, jqEvent, tagName, parentElem;
     if(!el) {
@@ -135,11 +152,17 @@ UIManager = (function() {
     jqEvent = el.jqEvent || 'click';
     emitEvents = el.emitEvents || 'uiman:fallback';
     parentElem = el.parentElem || this.uiContainer;
+    
+    /**
+     * UIManager~handler
+     * Handles the passed event.
+     */
     handler = function() {
       emitEvents.forEach(function(ev) {
         scope.e.emit(ev);
       });
     };
+    
     var newElement = '<' + tagName +
       ' id="' + identifier + 
       '" class="' + className + 
@@ -152,6 +175,12 @@ UIManager = (function() {
   // reaction on the looper tick event
   UIManager.prototype.updateOnTick = function(loopCursor) {};
 
+  /**
+   * Iterates over the list of elements (Object and elemes as properties) 
+   * and passes them to the drawElement fn.
+   * @method UIManager#drawElements
+   * @param {Object} elementList
+   */
   UIManager.prototype.drawElements = function(elementList) {
     var that = this;
 

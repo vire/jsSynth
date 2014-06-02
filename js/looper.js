@@ -1,5 +1,5 @@
 /**
-* Looper class, responsible for iteration and sequence logic.
+* @class - responsible for iteration and sequence logic.
 * Heavily inspired by the {@link https://github.com/michd/step-sequencer/blob/master/assets/js/tempo.js}
 */
 Looper = (function() {
@@ -7,8 +7,9 @@ Looper = (function() {
   Looper._instance = null;
 
   /**
-  * @Constructor
-  */
+   * @constructor
+   * @param {Object} options - diverse options passed via getInstance
+   */
   function Looper(options) {
     this.cursor = -1;
     this.transitionTimeout = null;
@@ -35,14 +36,21 @@ Looper = (function() {
 
   }
 
+  /**
+   * @method Looper.getInstance
+   * @return {Object} - the Looper instance
+   */
   Looper.getInstance = function() {
-    return this._instance != null ? this._instance : this._instance = (function(func, args, ctor) {
-      ctor.prototype = func.prototype;
-      var child = new ctor, result = func.apply(child, args);
-      return Object(result) === result ? result : child;
-    })(this, arguments, function(){});
+    return this._instance != null ? 
+      this._instance : 
+      this._instance = (function(func, args, ctor) {
+        ctor.prototype = func.prototype;
+        var child = new ctor, result = func.apply(child, args);
+        return Object(result) === result ? result : child;
+      })(this, arguments, function(){});
   };
 
+  // TODO - remove
   Looper.prototype.validateEmitter = function(extEm) {
     if(!extEm) {
       this.eventEmitter = false;
@@ -57,10 +65,15 @@ Looper = (function() {
     }
   };
 
+  // TODO - remove
   Looper.prototype.addEmitter = function(em) {
     this.e = this.validateEmitter(em);
   };
 
+  /**
+   * Set looping to true. starts ticking and emits `start` event.
+   * @method Looper#start
+   */
   Looper.prototype.start = function() {
     this.looping = true;
     this.tick();
@@ -68,23 +81,28 @@ Looper = (function() {
   };
   
   /**
+  * Iterates over the loop, update transitionTimeout, increment cursor;
   * @method Looper#tick
-  * Iterates over the loop, update transitionTimeout , increment cursor;
   */
   Looper.prototype.tick = function() {
     if(this.looping) {
-      this.transitionTimeout = setTimeout(this.tick.bind(this), this.tickDuration);
+      this.transitionTimeout = 
+        setTimeout(this.tick.bind(this), this.tickDuration);
     }
 
     this.cursor++;
 
-    // if the cursor reaches the end of the loop - reset to initial position
+    /** reset the cursor to initial position if it reaches end of loop */
     if(this.cursor > (this.loopLength - 1)) {
       this.cursor = 0;
     }
     this.e.emit('loop:tick');
   };
 
+  /**
+   * Set looping prop to false, disarms the loop, resets cursor and emits.
+   * @method Looper#stop
+   */
   Looper.prototype.stop = function() {
     this.looping = false;
     if(this.transitionTimeout) {
@@ -94,11 +112,19 @@ Looper = (function() {
     this.e.emit('loop:stop');
   };
 
+  /**
+   * Clear timeout of the transition timout prop to stop immediately.
+   * @method Looper#disarm
+   */
   Looper.prototype.disarm = function() {
     clearTimeout(this.transitionTimeout);
 
   };
 
+  /**
+   * Set the curors to the initial position.
+   * @method Looper#resetCursor
+   */
   Looper.prototype.resetCursor = function() {
     this.cursor = -1;
   };

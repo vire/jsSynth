@@ -7,6 +7,13 @@ OpenSource subtractive synthetizer/web audio API, written in JavaScript - [Live 
 1. clone this repo
 2. open ```index.html``` in browser
 
+
+## documentation
+
+1. install jsdoc via ```npm i -g jsdoc```
+2. generate into ./docs ```jsdoc ./js/*.js --verbose -d docs```
+
+
 ## Features
 
 * interactive virtual keyboard controller via mouse or keyboard
@@ -21,8 +28,12 @@ OpenSource subtractive synthetizer/web audio API, written in JavaScript - [Live 
 
 This project is currently dependendent on the following 3rd party libraries:
 
+* [jquery](https://github.com/jquery/jquery/) - MIT
 * [jquery-tmpl](https://github.com/BorisMoore/jquery-tmpl) - Dual licensed under the MIT or GPL Version 2 licenses.
-* [qwerty-hancock](https://github.com/stuartmemo/qwerty-hancock) - MIT  
+* [qwerty-hancock](https://github.com/stuartmemo/qwerty-hancock) - MIT
+* [Q - asynchronous promises](https://github.com/kriskowal/q) - MIT 
+* [jsdoc](https://github.com/jsdoc3/jsdoc) - Apache 2.0
+
 
 ## License
 

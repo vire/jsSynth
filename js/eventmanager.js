@@ -1,8 +1,9 @@
 EventManager = (function() {
   
   EventManager.instance = null;
+  
   /**
-  * @constructor EventManager.
+  * @constructor EventManager
   */
   function EventManager(opts) {
     this.registeredSubs = {};
@@ -51,7 +52,6 @@ EventManager = (function() {
    * @method EventManager#registerEvent
    * @param  {string } eventName
    * @param  {Function} emitFn
-   * @return {[type]}
    */
   EventManager.prototype.registerEvent = function(eventName, emitFn) {
     if(!eventName && 'function' !== typeof emitFn) {
@@ -76,7 +76,6 @@ EventManager = (function() {
    * @param  {string} eventName
    * @param  {Array | Object} data
    * @param  {Object} context - scope that needs the emitFn to be executed in.
-   * @return {[type]}
    */
   EventManager.prototype.emit = function(eventName, data, context) {
     var i, iMax;
