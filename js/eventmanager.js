@@ -3,15 +3,30 @@ EventManager = (function() {
   EventManager.instance = null;
   /**
   * @constructor EventManager.
-  * TODO Singletonize per application.
   */
   function EventManager(opts) {
     this.registeredSubs = {};
   }
 
   /**
-  * @method EventManager#register
-  */
+   * @method EventManager.getInstance
+   * @return {Object} - an EventManager instance - reused or newly created
+   */
+  EventManager.getInstance = function() {
+    return this.instance != null ? this.instance 
+      : this.instance = (function(func, args, ctor) {
+        ctor.prototype = func.prototype;
+        var child = new ctor,
+        result = func.apply(child, args);
+        return Object(result) === result ? result : child;
+      })(this, this.arguments, function(){});
+  }
+
+  /**
+   * @method EventManager#register
+   * @param  {Object} eventOrEvents
+   * @param  {Function} emitFn
+   */
   EventManager.prototype.register = function(eventOrEvents, emitFn) {
     return 'object' === typeof eventOrEvents ? 
       this.registerEvents(eventOrEvents) : 
@@ -20,8 +35,7 @@ EventManager = (function() {
 
   /**
    * @method EventManager#registerEvents
-   * @param  {[type]} eventsObject
-   * @return {[type]}
+   * @param  {Object} eventsObject
    */
   EventManager.prototype.registerEvents = function(eventsObject) {
     var that = this;
@@ -35,8 +49,8 @@ EventManager = (function() {
 
   /**
    * @method EventManager#registerEvent
-   * @param  {[type]} eventName
-   * @param  {[type]} emitFn
+   * @param  {string } eventName
+   * @param  {Function} emitFn
    * @return {[type]}
    */
   EventManager.prototype.registerEvent = function(eventName, emitFn) {
@@ -59,7 +73,7 @@ EventManager = (function() {
 
   /**
    * @method EventManager#emit
-   * @param  {String} eventName
+   * @param  {string} eventName
    * @param  {Array | Object} data
    * @param  {Object} context - scope that needs the emitFn to be executed in.
    * @return {[type]}

@@ -10,15 +10,17 @@ describe('EventManager', function() {
       expect(EventManager).toBeDefined();
     });
     it('should init instance prop only through .getInstance()', function() {
-      em = new EventManager();
       expect(EventManager.instance).toEqual(null);
+      em = EventManager.getInstance();
+      expect(EventManager.instance).not.toEqual(null);
       em = null;
     });
   });
 
   describe('register() method', function() {
     beforeEach(function() {
-      em = new EventManager();
+      em = EventManager.getInstance();
+      em.registeredSubs = {};
       spyOn(em, 'register').and.callThrough();
       spyOn(em, 'registerEvents').and.callThrough();
       spyOn(em, 'registerEvent').and.callThrough();
@@ -66,7 +68,8 @@ describe('EventManager', function() {
 
   describe('emit() method', function() {
     beforeEach(function() {
-      em = new EventManager();
+      em = EventManager.getInstance()
+      em.registeredSubs = {};
       spyOn(em, 'emit').and.callThrough();
       spyOn(em, 'register').and.callThrough();
     });    
