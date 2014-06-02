@@ -39,7 +39,6 @@ UIManager = (function() {
     };
 
     this.em = options.em;
-    
     this.initialize();
   }
 

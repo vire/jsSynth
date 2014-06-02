@@ -1,12 +1,16 @@
 EventManager = (function() {
   
   EventManager.instance = null;
-  
+
   /**
   * @constructor EventManager
   */
   function EventManager(opts) {
+    if('undefined' === typeof opts || !opts.iw) {
+        throw new Error('use the EventManager.getInstance() method');
+      }    
     this.registeredSubs = {};
+    this.opts = opts || {};
   }
 
   /**
@@ -17,10 +21,11 @@ EventManager = (function() {
     return this.instance != null ? this.instance 
       : this.instance = (function(func, args, ctor) {
         ctor.prototype = func.prototype;
-        var child = new ctor,
-        result = func.apply(child, args);
+        var param = [{iw: true}].concat(Array.prototype.slice.call(args, 0))
+        var child = new ctor, result = func.apply(child, param);
+        console.log("args", param)
         return Object(result) === result ? result : child;
-      })(this, this.arguments, function(){});
+      })(this, arguments, function(){});
   }
 
   /**

@@ -4,17 +4,26 @@
 var em = null;
 
 describe('EventManager', function() {
-  describe('core - ', function() {
+  describe('core', function() {
 
-    it('should be available on global', function() {
+    it('Class must available on global', function() {
       expect(EventManager).toBeDefined();
     });
-    it('should init instance prop only through .getInstance()', function() {
-      
-      // this test is trickey, if the EventManager has been instantiated in
-      // another test, this will fail
-      expect(EventManager.instance).toEqual(null);
-      em = EventManager.getInstance();
+
+    it('must be instantianted via getInstance()', function() {
+      var err = null;
+      try {
+        em = new EventManager();
+      } catch(e) {
+        err = e;
+      };
+      expect(err).toEqual(Error('use the EventManager.getInstance() method'));
+    })
+
+    it('.getInstance() returns always the same instance', function() {
+      var a = EventManager.getInstance();
+      var b = EventManager.getInstance();
+      expect(a === b).toBeTruthy();
       expect(EventManager.instance).not.toEqual(null);
       em = null;
     });
