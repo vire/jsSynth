@@ -23,8 +23,11 @@ UIManager = (function() {
     this.rootContainerId = options.rootContainerId;
     this.uiContainerId = options.uiContainerId;
     this.channelContainerId = options.channelContainerId || 
-    'seq-channel-container';
+      'seq-channel-container';
     this.eventId = 'uiman';
+
+    this.rootContainer = $('#'+ this.rootContainerId);
+    
     this.e = options.e || {
       // stub method
       emit: function(param) {
@@ -34,6 +37,9 @@ UIManager = (function() {
         'looper:tick': this.updateOnTick
       }
     };
+
+    this.em = options.em;
+    
     this.initialize();
   }
 
@@ -117,19 +123,19 @@ UIManager = (function() {
    * @method UIManager#initialize 
    */
   UIManager.prototype.initialize = function() {
-    this.em =  EventManager.getInstance();
     this.uiContainer = $('<div id=' + this.uiContainerId + '></div>');
-    this.uiContainer.appendTo( $('#' + this.rootContainerId));
+    this.uiContainer.appendTo(this.rootContainer);
+    this.channelContainer = $('<div id=' + this.channelContainerId + '>')
+      .css({
+        background: 'red',
+        width: '400px',
+        height: '150px'}
+      );
 
-    var channelContainer = {
-      background: 'red',
-      width: '400px',
-      height: '150px'
-    };
-
-    this.uiContainer.append($('<div id=' + this.channelContainerId +
-     '>').css(channelContainer));
+    this.uiContainer.append(this.channelContainer);
     
+    // this.em.register()
+
     var elemList = this.getElementList();
     this.drawElements(elemList);
   };

@@ -30,10 +30,10 @@ Looper = (function() {
     this.loopSectionLegnth = options.loopSectionLegnth || 4;
 
     // loopLenght consists of innerIterations, steps per innerIteration
-    this.loopLength = this.innerLoops * this.loopSections * this.loopSectionLegnth;
+    this.loopLength = 
+      this.innerLoops * this.loopSections * this.loopSectionLegnth;
 
     this.addEmitter(options.e);
-
   }
 
   /**

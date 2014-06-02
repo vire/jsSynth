@@ -10,6 +10,9 @@ describe('EventManager', function() {
       expect(EventManager).toBeDefined();
     });
     it('should init instance prop only through .getInstance()', function() {
+      
+      // this test is trickey, if the EventManager has been instantiated in
+      // another test, this will fail
       expect(EventManager.instance).toEqual(null);
       em = EventManager.getInstance();
       expect(EventManager.instance).not.toEqual(null);
