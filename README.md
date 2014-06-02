@@ -1,4 +1,4 @@
-jsSynth
+jsSynth [![Build Status](https://travis-ci.org/vire/jsSynth.svg?branch=sequencer)](https://travis-ci.org/vire/jsSynth)
 =======
 OpenSource subtractive synthetizer/web audio API, written in JavaScript - [Live Example](http://dualsoul.net/tmp/jsSynth/)
 
@@ -10,8 +10,8 @@ OpenSource subtractive synthetizer/web audio API, written in JavaScript - [Live 
 
 ## documentation
 
-1. install jsdoc via ```npm i -g jsdoc```
-2. generate into ./docs ```jsdoc ./js/*.js --verbose -d docs```
+1. install dependencies via ```npm install```
+2. generate into ./docs ```npm run docs```
 
 
 ## Features
@@ -33,7 +33,7 @@ This project is currently dependendent on the following 3rd party libraries:
 * [qwerty-hancock](https://github.com/stuartmemo/qwerty-hancock) - MIT
 * [Q - asynchronous promises](https://github.com/kriskowal/q) - MIT 
 * [jsdoc](https://github.com/jsdoc3/jsdoc) - Apache 2.0
-
+* [DocStrap](https://github.com/terryweiss/docstrap) - MIT
 
 ## License
 
