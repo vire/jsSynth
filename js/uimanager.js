@@ -20,8 +20,10 @@ UIManager = (function() {
   function UIManager(options) {
     var that = this;
     options = options || {};
-    this.rootContainerId = options.rootContainerId;
-    this.uiContainerId = options.uiContainerId;
+    this.rootContainerId = options.rootContainerId ||
+      createRootElement();
+    this.uiContainerId = options.uiContainerId || 
+      'ui-container';
     this.channelContainerId = options.channelContainerId || 
       'seq-channel-container';
     this.eventId = 'uiman';
@@ -40,10 +42,18 @@ UIManager = (function() {
 
     this.em = options.em;
     this.initialize();
+
+    function createRootElement() {
+      var df = document.createElement('div');
+      df.id = "sequencer-root";
+      document.body.insertBefore(df, document.body.childNodes[0]);
+    }
   }
 
   UIManager.instance = null;
-
+  UIManager.destroy = function() {
+    this.instance = null;
+  }
   /**
    * @method UIManager.getInstance - static method for instantiation.
    * @return {Object}
@@ -112,20 +122,21 @@ UIManager = (function() {
   UIManager.prototype.initialize = function() {
     this.uiContainer = $('<div id=' + this.uiContainerId + '></div>');
     this.uiContainer.appendTo(this.rootContainer);
-    this.channelContainer = $('<div id=' + this.channelContainerId + '>')
-      .css({
-        background: 'red',
-        width: '400px',
-        height: '150px'}
-      );
+    this.channelContainer = $('<div id=' + this.channelContainerId + '>');
 
     this.uiContainer.append(this.channelContainer);
     
-    // this.em.register()
-
     var elemList = this.getElementList();
     this.drawElements(elemList);
     this.drawChannels();
+    
+    /** UIManager API for other components  - dedepends on EventManager */
+    try {this.em.register({
+          'uiman:blinkOnTick' : this.blinkOnTick
+        });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   /**
@@ -151,8 +162,8 @@ UIManager = (function() {
     parentElem = el.parentElem || this.uiContainer;
     
     /**
-     * UIManager~handler
      * Handles the passed event.
+     * @function UIManager~handler
      */
     handler = function() {
       emitEvents.forEach(function(ev) {
@@ -204,32 +215,82 @@ UIManager = (function() {
     }
   };
 
-  UIManager.prototype.drawChannels = function() {
-    // default channelCount can be easily overridden
-    var chCnt = this.defaultChannelCount;
-    var patternSegments = 4 // Looper.loopSections ~ beats per loop
-    var segmentItems = 4 // Looper.loopSectionLegnth ~ notes per beat
-    var i, j, k;
+  /**
+   * Method for highlighting the indicator element, whenever an 
+   * uiman:blinkOnTick event is played is emited.
+   * @method UIManager#blinkOnTick
+   * @return {[type]} [description]
+   */
+  UIManager.prototype.blinkOnTick = function() {
+    (function toggle() {
+          $('.indicator').addClass('active');
+          setTimeout(function() {
+            $('.indicator').removeClass('active');
+          },200);
+        })();    
+  };
 
-    var controlsStyle = 'style=\'height: 30px;background: white; width: 30%;border-bottom: 1px solid;float: left;\''
-    var patternStyle = 'style=\'height: 30px;background: wheat; width: 70%;border-bottom: 1px solid;float: left;\''
+  /**
+   * Adds the given number of segments to the channel.
+   * @method UIManager#addSegments
+   * @param {numer} num - beats per loop
+   */
+  UIManager.prototype.addSegments = function(num) {
+    var j;
+    num = num || 4;
+
+    for(j = 0; j < num; j +=1) {
+      $('.channel-pattern').append($('<div class=\'pattern-segment\'>'));
+    }
+  };
+
+  /**
+   * Adds the given number of tick/items to each segment of all channels.
+   * @method UIManager#addSegments
+   * @param {numer} num - notes per beat
+   * @param {string} className - name of the class to be added
+   */  
+  UIManager.prototype.addSegmentItems = function(num, className) {
+    var k, 
+      parentElem = 'pattern-segment';
+    className = className || 'segment-item';  
+    num = num || 4;
+    for(k = 0; k < num; k += 1) {
+      $('.' + parentElem).append(createSegmentElement(className));
+    } 
+
+    /**
+     * jQuery util function to preven function calling inside a for lopp.
+     * @function UIManager~createSegmentElement
+     * @param  {string} className [description]
+     * @return {Object}           jQuery object
+     */
+    function createSegmentElement(className) {
+      return $('<div class=' + className + '>').click(function() {
+          $(this).toggleClass('armed');
+      })
+    }   
+  };
+
+  /**
+   * Just puts the number of channels to the channel container.
+   * @method UIManager#drawChannels
+   * @param  {numer} num - track representation
+   */
+  UIManager.prototype.drawChannels = function(num) {
+    var chCnt = num || this.defaultChannelCount;
+    var i;
+
     for(i = 0; i < chCnt; i +=1) {
       var channelTemplate = $('<div class=\'seq-channel-0'+ i +'\'>' + 
-        '<div ' + controlsStyle + ' class=\'channel-controls\'></div>' + 
-        '<div ' + patternStyle + ' class=\'channel-pattern\'></div></div>');
-      
-      
+        '<div class=\'channel-controls\'><div class=\'indicator\'></div></div>' + 
+        '<div class=\'channel-pattern\'></div></div>');
       this.channelContainer.append(channelTemplate);
     }
 
-    for(j = 0; j < patternSegments; j +=1) {
-      $('.channel-pattern').append($('<div class=\'pattern-segment\'>'))
-    }
-
-    for(k = 0; k < segmentItems; k += 1) {
-      $('.pattern-segment').append($('<div class=\'segment-item\'>'))
-    }
-  }
+    this.addSegments();
+    this.addSegmentItems();    
+  };
 
   return UIManager;
 })();

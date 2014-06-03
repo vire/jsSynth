@@ -1,28 +1,52 @@
 /* globals UIManager, describe, beforeEach, spyOn, afterEach, it, xit, expect */
 'use strict';
 
-document.write('<div id="sequencer-test-container" style="height: 200px;background: white;border: 1px solid black;"></div>');
+var result = 0;
+(function paintPretty() {
+  var head = document.getElementsByTagName('head')[0]; 
+  var link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href='css/test-main.css';
+  link.type = 'text/css';
+  head.appendChild(link);
 
+})();
 
+function appendTestContainer() {
+  document.write('<div id="sequencer-test-container" ' +
+    'style="height: 200px;background: white;border: 1px solid black;">'+
+    '</div>');
+}
+appendTestContainer();
+/**
+ * Sometimes it's better to just mock the EventManager
+ */
 var eventManagerMock = {
   'registeredSubs' : {},
   'register': function() {},
   'emit' : function() {}
 }
-
-// this should be mocked :)
-var eventManager = EventManager.getInstance();
-
+/** Options passed to the .getIntanceMehtod */
 var opts = {
   rootContainerId: 'sequencer-test-container',
-  uiContainerId: 'ui-container',
-  em: eventManager
+  em: EventManager.getInstance()
 };
+
 var uic;
-var uimanager = UIManager.getInstance(opts);
-var elemList = uimanager.getElementList();
+var uimanager;
+var elemList;
 
 describe('UIManager', function() {
+  
+  beforeEach(function() {
+    result++;
+    uimanager = UIManager.getInstance(opts);
+    elemList = uimanager.getElementList();
+  });
+  
+  afterEach(function() {
+    // console.log(result)
+  })
 
   describe('core functionality', function() {
     it('should be defined on global', function() {
@@ -93,13 +117,14 @@ describe('UIManager', function() {
   });  
 
   describe('.drawElement() method ', function() {
-    uic = uimanager.uiContainer;
     
     beforeEach(function() {
+      uic = uimanager.uiContainer;
       spyOn(uimanager, 'drawElement').and.callThrough();
       spyOn(uimanager.e, 'emit');
       
     });
+
     afterEach(function() {
       uic.empty();
     });
@@ -144,8 +169,6 @@ describe('UIManager', function() {
   });
 
   describe('.drawElements() method', function() {
-    uic = uimanager.uiContainer;
-    
     var sampleList = {
       "category1" : {
         'play' : {
@@ -161,7 +184,7 @@ describe('UIManager', function() {
     }
 
     beforeEach(function() {
-      
+      uic = uimanager.uiContainer;
       spyOn(uimanager, 'drawElements').and.callThrough();
       spyOn(uimanager, 'drawElement').and.callThrough();
       spyOn(uimanager.e, 'emit');

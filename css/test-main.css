@@ -1,0 +1,83 @@
+#seq-channel-container {
+/*  width: 400px;
+  height: 150px;
+  background: red;*/
+}
+
+.channel-controls {
+  height: 30px;
+  width: 20%;
+  float: left;
+  background: #979797;
+}
+
+
+.channel-controls .indicator {
+  height: 28px;
+  width: 10px;
+  margin: 1px 5px;
+  background: #979797;
+  float: right;
+}
+
+.channel-controls .indicator.active {
+  background: white;
+}
+
+/*.channel-controls:nth-child(odd) {
+  background: #C0FFF5;
+}
+.channel-controls:nth-child(even) {
+  background: #C0FFCF;
+  }*/
+
+  .channel-pattern {
+    height: 31px;
+/*  background: wheat;
+  width: 70%;
+  border-bottom: 1px solid;
+  float: left;*/
+}
+
+.pattern-segment {
+  background: ;
+  width: 70px;
+  float:left;
+  height: 30px;
+  display: block;
+}
+
+.pattern-segment:nth-child(odd) {
+  background: black;
+}
+.pattern-segment:nth-child(even) {
+  background: #4B4B4B;
+}
+
+.segment-item {
+  height: 28px;
+  margin: 1px 0 0 2px;
+  width: 15px;
+  display: block;
+  float: left;
+}
+
+.segment-item.armed {
+  border: 3px solid #E4E49F;
+  width: 9px;
+  height: 22px;
+}
+
+.segment-item:nth-child(odd) {
+  background: #87CEEB;
+}
+.segment-item:nth-child(even) {
+  background: gray;
+}
+
+.segment-item.armed:nth-child(odd) {
+  border: 3px solid #E4E49F;
+}
+.segment-item.armed:nth-child(even) {
+  border: 3px solid #4DDD75;
+}
