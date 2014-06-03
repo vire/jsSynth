@@ -13,7 +13,6 @@ Looper = (function() {
   function Looper(options) {
     this.cursor = -1;
     this.transitionTimeout = null;
-    
     //  iterate over options and add them to the props?
     options = options || {};
 
@@ -33,7 +32,8 @@ Looper = (function() {
     this.loopLength = 
       this.innerLoops * this.loopSections * this.loopSectionLegnth;
 
-    this.addEmitter(options.e);
+    this.em = options.em;
+
   }
 
   /**
@@ -50,26 +50,6 @@ Looper = (function() {
       })(this, arguments, function(){});
   };
 
-  // TODO - remove
-  Looper.prototype.validateEmitter = function(extEm) {
-    if(!extEm) {
-      this.eventEmitter = false;
-      return {
-        failedCalls: 0,
-        emit: function(event) {
-          this.failedCalls++;        }
-      };
-    } else {
-      this.eventEmitter = true;
-      return extEm.e;
-    }
-  };
-
-  // TODO - remove
-  Looper.prototype.addEmitter = function(em) {
-    this.e = this.validateEmitter(em);
-  };
-
   /**
    * Set looping to true. starts ticking and emits `start` event.
    * @method Looper#start
@@ -77,7 +57,7 @@ Looper = (function() {
   Looper.prototype.start = function() {
     this.looping = true;
     this.tick();
-    this.e.emit('loop:start');
+    this.em.emit('loop:start');
   };
   
   /**
@@ -96,7 +76,7 @@ Looper = (function() {
     if(this.cursor > (this.loopLength - 1)) {
       this.cursor = 0;
     }
-    this.e.emit('loop:tick');
+    this.em.emit('loop:tick');
   };
 
   /**
@@ -109,7 +89,7 @@ Looper = (function() {
       this.disarm();
     }
     this.resetCursor();
-    this.e.emit('loop:stop');
+    this.em.emit('loop:stop');
   };
 
   /**

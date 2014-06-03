@@ -15,6 +15,7 @@ UIManager = (function() {
   'use strict';
   
   /**
+   * @constructor
    * @param {Object} options
    */
   function UIManager(options) {
@@ -43,6 +44,11 @@ UIManager = (function() {
     this.em = options.em;
     this.initialize();
 
+    /**
+     * If not root is specified in constructor options, 
+     * this fn explicitly adds the seq-root-elem into DOM.
+     * @method  UIManager~createRootElement
+     */
     function createRootElement() {
       var df = document.createElement('div');
       df.id = "sequencer-root";
@@ -51,9 +57,12 @@ UIManager = (function() {
   }
 
   UIManager.instance = null;
+  
+  // TODO - just for test purposes.
   UIManager.destroy = function() {
     this.instance = null;
   }
+  
   /**
    * @method UIManager.getInstance - static method for instantiation.
    * @return {Object}
@@ -68,6 +77,7 @@ UIManager = (function() {
   };
 
   /**
+   * Setter for the UIManager element list property.
    * @method UIManager#setElementList
    * @return {Object}
    */
@@ -76,6 +86,7 @@ UIManager = (function() {
   };
 
   /**
+   * Getter for the UIManager element list property.
    * @method UIManager#getElementList
    * @return {Object}
    */
@@ -219,7 +230,6 @@ UIManager = (function() {
    * Method for highlighting the indicator element, whenever an 
    * uiman:blinkOnTick event is played is emited.
    * @method UIManager#blinkOnTick
-   * @return {[type]} [description]
    */
   UIManager.prototype.blinkOnTick = function() {
     (function toggle() {
@@ -233,7 +243,7 @@ UIManager = (function() {
   /**
    * Adds the given number of segments to the channel.
    * @method UIManager#addSegments
-   * @param {numer} num - beats per loop
+   * @param {number} num - beats per loop
    */
   UIManager.prototype.addSegments = function(num) {
     var j;
@@ -247,7 +257,7 @@ UIManager = (function() {
   /**
    * Adds the given number of tick/items to each segment of all channels.
    * @method UIManager#addSegments
-   * @param {numer} num - notes per beat
+   * @param {number} num - notes per beat
    * @param {string} className - name of the class to be added
    */  
   UIManager.prototype.addSegmentItems = function(num, className) {
@@ -260,7 +270,7 @@ UIManager = (function() {
     } 
 
     /**
-     * jQuery util function to preven function calling inside a for lopp.
+     * jQuery util function to prevent function calling inside a for loop.
      * @function UIManager~createSegmentElement
      * @param  {string} className [description]
      * @return {Object}           jQuery object
@@ -275,7 +285,7 @@ UIManager = (function() {
   /**
    * Just puts the number of channels to the channel container.
    * @method UIManager#drawChannels
-   * @param  {numer} num - track representation
+   * @param  {number} num - track representation
    */
   UIManager.prototype.drawChannels = function(num) {
     var chCnt = num || this.defaultChannelCount;

@@ -38,6 +38,7 @@ var elemList;
 
 describe('UIManager', function() {
   
+  // runs before each test
   beforeEach(function() {
     result++;
     uimanager = UIManager.getInstance(opts);
