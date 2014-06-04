@@ -32,22 +32,22 @@ EventManager = (function() {
    * @param  {Object} eventOrEvents
    * @param  {Function} emitFn
    */
-  EventManager.prototype.register = function(eventOrEvents, emitFn) {
+  EventManager.prototype.register = function(eventOrEvents, emitFn, context) {
     return 'object' === typeof eventOrEvents ? 
-      this.registerEvents(eventOrEvents) : 
-      this.registerEvent(eventOrEvents, emitFn);
+      this.registerEvents(eventOrEvents, context) : 
+      this.registerEvent(eventOrEvents, emitFn, context);
   };
 
   /**
    * @method EventManager#registerEvents
    * @param  {Object} eventsObject
    */
-  EventManager.prototype.registerEvents = function(eventsObject) {
+  EventManager.prototype.registerEvents = function(eventsObject, context) {
     var that = this;
-
+    console.log('registerEvents', eventsObject, context)
     for(var eventName in eventsObject) {
       if(eventsObject.hasOwnProperty(eventName)) {
-        this.registerEvent(eventName, eventsObject[eventName]);
+        this.registerEvent(eventName, eventsObject[eventName], context);
       }
     }
   };
@@ -57,7 +57,7 @@ EventManager = (function() {
    * @param  {string } eventName
    * @param  {Function} emitFn
    */
-  EventManager.prototype.registerEvent = function(eventName, emitFn) {
+  EventManager.prototype.registerEvent = function(eventName, emitFn, context) {
     if(!eventName && 'function' !== typeof emitFn) {
       throw 'You must pass eventName a emitFn to registerEvent()';
     };
@@ -68,7 +68,7 @@ EventManager = (function() {
       subscribers = this.registeredSubs[eventName] = [];
     }
 
-    subscribers.push({emitFn: emitFn});
+    subscribers.push({emitFn: emitFn, context: context});
   };
 
   EventManager.prototype.deregister = function() {
@@ -92,12 +92,11 @@ EventManager = (function() {
     if(!subscribers) {
       return;
     };
-
     
     for(i = 0, iMax = subscribers.length; i < iMax; i += 1) {
-      subscribers[i].emitFn.apply(context, data);
+      console.log('subscribers[i]', subscribers[i].context)
+      subscribers[i].emitFn.apply(subscribers[i].context, data);
     }
-
   };
 
   return EventManager;

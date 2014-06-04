@@ -34,6 +34,16 @@ Looper = (function() {
 
     this.em = options.em;
 
+    try {
+      this.em.register({
+        'uiman:play' : this.start,
+        'uiman:pause' : this.pause,
+        'uiman:stop' : this.stop
+      }, null, this)
+    }
+    catch (e) {
+      console.error(e);
+    }
   }
 
   /**
@@ -55,9 +65,13 @@ Looper = (function() {
    * @method Looper#start
    */
   Looper.prototype.start = function() {
+    if(this.looping) {
+      this.resetCursor();
+      return;
+    }
     this.looping = true;
     this.tick();
-    this.em.emit('loop:start');
+    this.em.emit('looper:start');
   };
   
   /**
@@ -65,6 +79,7 @@ Looper = (function() {
   * @method Looper#tick
   */
   Looper.prototype.tick = function() {
+    console.log('Looper.tick() - cursor', this.cursor)
     if(this.looping) {
       this.transitionTimeout = 
         setTimeout(this.tick.bind(this), this.tickDuration);
@@ -76,7 +91,7 @@ Looper = (function() {
     if(this.cursor > (this.loopLength - 1)) {
       this.cursor = 0;
     }
-    this.em.emit('loop:tick');
+    this.em.emit('looper:tick', this.cursor);
   };
 
   /**
@@ -89,7 +104,7 @@ Looper = (function() {
       this.disarm();
     }
     this.resetCursor();
-    this.em.emit('loop:stop');
+    this.em.emit('looper:stop');
   };
 
   /**
@@ -102,7 +117,18 @@ Looper = (function() {
   };
 
   /**
-   * Set the curors to the initial position.
+   * Puses the looper === set looping to false.
+   * @method  Looper#pause
+   * @return {[type]} [description]
+   */
+  Looper.prototype.pause = function() {
+    this.looping = false;
+    this.disarm();
+    this.em.emit('looper:pause');
+  }
+
+  /**
+   * Set the cursor to the initial position.
    * @method Looper#resetCursor
    */
   Looper.prototype.resetCursor = function() {

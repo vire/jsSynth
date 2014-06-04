@@ -1,7 +1,8 @@
 /* globals UIManager, describe, beforeEach, spyOn, afterEach, it, xit, expect */
 'use strict';
 
-var result = 0;
+var result = 0, uic, uimanager, elemList, looper, eventManager;
+
 (function paintPretty() {
   var head = document.getElementsByTagName('head')[0]; 
   var link = document.createElement('link');
@@ -26,15 +27,16 @@ var eventManagerMock = {
   'register': function() {},
   'emit' : function() {}
 }
+
+eventManager = EventManager.getInstance();
+
+looper = Looper.getInstance({em: eventManager});
+
 /** Options passed to the .getIntanceMehtod */
 var opts = {
   rootContainerId: 'sequencer-test-container',
-  em: EventManager.getInstance()
+  em: eventManager
 };
-
-var uic;
-var uimanager;
-var elemList;
 
 describe('UIManager', function() {
   
@@ -115,15 +117,13 @@ describe('UIManager', function() {
       expect(uimanager.rootContainer.find('.seq-play-button')[0]).toBeDefined();
       expect(uimanager.rootContainer.find('.seq-stop-button')[0]).toBeDefined();
     });   
-  });  
+  });
 
-  describe('.drawElement() method ', function() {
+  xdescribe('.drawElement() method ', function() {
     
     beforeEach(function() {
       uic = uimanager.uiContainer;
       spyOn(uimanager, 'drawElement').and.callThrough();
-      spyOn(uimanager.e, 'emit');
-      
     });
 
     afterEach(function() {
@@ -169,7 +169,7 @@ describe('UIManager', function() {
     });
   });
 
-  describe('.drawElements() method', function() {
+  xdescribe('.drawElements() method', function() {
     var sampleList = {
       "category1" : {
         'play' : {
@@ -188,7 +188,7 @@ describe('UIManager', function() {
       uic = uimanager.uiContainer;
       spyOn(uimanager, 'drawElements').and.callThrough();
       spyOn(uimanager, 'drawElement').and.callThrough();
-      spyOn(uimanager.e, 'emit');
+
       
     });
     afterEach(function() {

@@ -30,17 +30,6 @@ UIManager = (function() {
     this.eventId = 'uiman';
     this.defaultChannelCount = 4;
     this.rootContainer = $('#'+ this.rootContainerId);
-    
-    this.e = options.e || {
-      // stub method
-      emit: function(param) {
-        console.log(param);
-      },
-      listenTo: {
-        'looper:tick': this.updateOnTick
-      }
-    };
-
     this.em = options.em;
     this.initialize();
 
@@ -143,8 +132,9 @@ UIManager = (function() {
     
     /** UIManager API for other components  - dedepends on EventManager */
     try {this.em.register({
-          'uiman:blinkOnTick' : this.blinkOnTick
-        });
+          'uiman:blinkOnTick' : this.blinkOnTick,
+          'looper:tick' : this.highlightItem
+        }, null, this);
     } catch (e) {
       console.log(e);
     }
@@ -158,8 +148,6 @@ UIManager = (function() {
   UIManager.prototype.drawElement = function(el, scope) {
     var className, identifier,handler, emitEvents, label, jqEvent, tagName, parentElem;
     
-
-
     if(!el) {
       throw new Error('no element for add provided!');
     }
@@ -301,6 +289,16 @@ UIManager = (function() {
     this.addSegments();
     this.addSegmentItems();    
   };
+
+  UIManager.prototype.highlightItem = function(index) {
+    console.log('index',index);
+
+    var item = $('.channel-pattern').find('.segment-item').eq(index);
+    item.addClass('playing');
+    setTimeout(function() {
+      item.removeClass('playing');
+    },500);
+  }
 
   return UIManager;
 })();
