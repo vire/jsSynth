@@ -79,7 +79,6 @@ Looper = (function() {
   * @method Looper#tick
   */
   Looper.prototype.tick = function() {
-    console.log('Looper.tick() - cursor', this.cursor)
     if(this.looping) {
       this.transitionTimeout = 
         setTimeout(this.tick.bind(this), this.tickDuration);

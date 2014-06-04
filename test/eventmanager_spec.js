@@ -4,32 +4,29 @@
 var em = null;
 
 describe('EventManager', function() {
-  describe('core', function() {
-
-    it('Class must available on global', function() {
-      expect(EventManager).toBeDefined();
-    });
-
-    it('must be instantianted via getInstance()', function() {
-      var err = null;
-      try {
-        em = new EventManager();
-      } catch(e) {
-        err = e;
-      };
-      expect(err).toEqual(Error('use the EventManager.getInstance() method'));
-    })
-
-    it('.getInstance() returns always the same instance', function() {
-      var a = EventManager.getInstance();
-      var b = EventManager.getInstance();
-      expect(a === b).toBeTruthy();
-      expect(EventManager.instance).not.toEqual(null);
-      em = null;
-    });
+  it('class must available on global', function() {
+    expect(EventManager).toBeDefined();
   });
 
-  describe('register() method', function() {
+  it('must be instantianted via getInstance()', function() {
+    var err = null;
+    try {
+      em = new EventManager();
+    } catch(e) {
+      err = e;
+    };
+    expect(err).toEqual(Error('use the EventManager.getInstance() method'));
+  })
+
+  it('.getInstance() returns always the same instance', function() {
+    var a = EventManager.getInstance();
+    var b = EventManager.getInstance();
+    expect(a === b).toBeTruthy();
+    expect(EventManager.instance).not.toEqual(null);
+    em = null;
+  });
+
+  describe('.register() -', function() {
     beforeEach(function() {
       em = EventManager.getInstance();
       em.registeredSubs = {};
@@ -40,12 +37,12 @@ describe('EventManager', function() {
     afterEach(function() {
       em = null;
     });
-    it('must be called with params', function() {
+    it('must be invoked with params: `eventOrEvents`, `emitFn`, `context`', function() {
       var err = null;
       expect(em instanceof EventManager).toBeTruthy();
-      expect(em.registerEvent).not.toHaveBeenCalled();
+      expect(em.register).not.toHaveBeenCalled();
       try {
-        em.registerEvent();
+        em.register();
       } catch (e) {
         err = e;
       }
@@ -78,52 +75,52 @@ describe('EventManager', function() {
     });
   });
 
-  describe('emit() method', function() {
-    beforeEach(function() {
-      em = EventManager.getInstance()
-      em.registeredSubs = {};
-      spyOn(em, 'emit').and.callThrough();
-      spyOn(em, 'register').and.callThrough();
-    });    
+describe('emit() method', function() {
+  beforeEach(function() {
+    em = EventManager.getInstance()
+    em.registeredSubs = {};
+    spyOn(em, 'emit').and.callThrough();
+    spyOn(em, 'register').and.callThrough();
+  });    
 
-    afterEach(function() {
-      em = null;
-    });
-
-    it('is defined and callable', function() {
-      em.emit('first:event', {a:1}, this);
-      expect(em.emit).toHaveBeenCalled();
-    });
-    it('emits an event defined in registeredSubs', function() {
-      var eventName = 'first:event';
-      var eventFn = function() {
-        console.log('first:event');
-      };
-      em.register(eventName, eventFn);
-      spyOn(em.registeredSubs[eventName][0], 'emitFn').and.callThrough();
-      em.emit(eventName);
-      expect(em.registeredSubs[eventName][0].emitFn).toHaveBeenCalled();
-    });
-    it('emits all emitFunctions registered under one event', function() {
-      var counter = 0;
-      var eventName = 'first:event';
-      var firstEmitFn = function() {
-        return counter += 1;
-      };
-      var secondEmitFn = function() {
-        return counter += 1;
-      }
-
-      em.register(eventName, firstEmitFn);
-      expect(em.register).toHaveBeenCalled();
-      em.register(eventName, secondEmitFn);
-      expect(em.register).toHaveBeenCalled();
-      spyOn(em.registeredSubs[eventName][0], 'emitFn').and.callThrough();
-      spyOn(em.registeredSubs[eventName][1], 'emitFn').and.callThrough();
-      em.emit(eventName);
-      expect(counter).toEqual(2);
-      expect(em.registeredSubs[eventName][0].emitFn).toHaveBeenCalled();
-      expect(em.registeredSubs[eventName][1].emitFn).toHaveBeenCalled();
-    });
+  afterEach(function() {
+    em = null;
   });
+
+  it('is defined and callable', function() {
+    em.emit('first:event', {a:1}, this);
+    expect(em.emit).toHaveBeenCalled();
+  });
+  it('emits an event defined in registeredSubs', function() {
+    var eventName = 'first:event';
+    var eventFn = function() {
+      console.log('first:event');
+    };
+    em.register(eventName, eventFn);
+    spyOn(em.registeredSubs[eventName][0], 'emitFn').and.callThrough();
+    em.emit(eventName);
+    expect(em.registeredSubs[eventName][0].emitFn).toHaveBeenCalled();
+  });
+  it('emits all emitFunctions registered under one event', function() {
+    var counter = 0;
+    var eventName = 'first:event';
+    var firstEmitFn = function() {
+      return counter += 1;
+    };
+    var secondEmitFn = function() {
+      return counter += 1;
+    }
+
+    em.register(eventName, firstEmitFn);
+    expect(em.register).toHaveBeenCalled();
+    em.register(eventName, secondEmitFn);
+    expect(em.register).toHaveBeenCalled();
+    spyOn(em.registeredSubs[eventName][0], 'emitFn').and.callThrough();
+    spyOn(em.registeredSubs[eventName][1], 'emitFn').and.callThrough();
+    em.emit(eventName);
+    expect(counter).toEqual(2);
+    expect(em.registeredSubs[eventName][0].emitFn).toHaveBeenCalled();
+    expect(em.registeredSubs[eventName][1].emitFn).toHaveBeenCalled();
+  });
+});
 });

@@ -62,10 +62,6 @@
   float: left;
 }
 
-.segment-item.playing {
-  background: red;
-}
-
 .segment-item.armed {
   border: 3px solid #E4E49F;
   width: 9px;
@@ -84,4 +80,10 @@
 }
 .segment-item.armed:nth-child(even) {
   border: 3px solid #4DDD75;
+}
+
+.segment-item.playing {
+  border: 2px solid red;
+  width: 11px;
+  height: 24px
 }

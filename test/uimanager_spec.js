@@ -22,7 +22,7 @@ appendTestContainer();
 /**
  * Sometimes it's better to just mock the EventManager
  */
-var eventManagerMock = {
+ var eventManagerMock = {
   'registeredSubs' : {},
   'register': function() {},
   'emit' : function() {}
@@ -39,7 +39,7 @@ var opts = {
 };
 
 describe('UIManager', function() {
-  
+
   // runs before each test
   beforeEach(function() {
     result++;
@@ -47,46 +47,41 @@ describe('UIManager', function() {
     elemList = uimanager.getElementList();
   });
   
-  afterEach(function() {
-    // console.log(result)
-  })
-
-  describe('core functionality', function() {
-    it('should be defined on global', function() {
-      expect(UIManager).toBeDefined();
-      expect(UIManager.prototype.constructor.name).toEqual('UIManager');
-    });
-    it('relies on jquery', function() {
-      it('needs jquery', function() {
-        expect($).toBeDefined();
-      });    
-    });
-    it('should allow .getInstance() returning a singleton instance', 
-      function() {
-        var anotherUIManager = UIManager.getInstance();
-        expect(uimanager).toBeDefined();
-        expect(UIManager === UIManager).toBeTruthy();
-      }
+  it('should be defined on global', function() {
+    expect(UIManager).toBeDefined();
+    expect(UIManager.prototype.constructor.name).toEqual('UIManager');
+  });
+  it('relies on jquery', function() {
+    it('needs jquery', function() {
+      expect($).toBeDefined();
+    });    
+  });
+  it('should allow .getInstance() returning a singleton instance', 
+    function() {
+      var anotherUIManager = UIManager.getInstance();
+      expect(uimanager).toBeDefined();
+      expect(UIManager === UIManager).toBeTruthy();
+    }
     );
 
-    it('must contain the `EventManager` instance', function() {
-      expect(uimanager.em).toBeDefined();
-      expect(uimanager.em.register).toBeDefined();
-    });
+  it('must contain the `EventManager` instance', function() {
+    expect(uimanager.em).toBeDefined();
+    expect(uimanager.em.register).toBeDefined();
+  });
 
-    it('must contain its `uiContainerId` ', function() {
-      expect(uimanager.uiContainerId).toBeDefined();
-      expect(uimanager.uiContainerId).toMatch('ui-container');
-    });
-    
-    it('must contain an `uiContainer` property' ,function() {
-      expect(uimanager.uiContainer).toBeDefined();
-    });
-    
-    it('should contain elements in a element list property', function() {
-      var elemList = uimanager.getElementList();
-      expect(elemList).not.toBe({});
-      expect(elemList).toBeDefined();
+  it('must contain its `uiContainerId` ', function() {
+    expect(uimanager.uiContainerId).toBeDefined();
+    expect(uimanager.uiContainerId).toMatch('ui-container');
+  });
+
+  it('must contain an `uiContainer` property' ,function() {
+    expect(uimanager.uiContainer).toBeDefined();
+  });
+
+  it('should contain elements in a element list property', function() {
+    var elemList = uimanager.getElementList();
+    expect(elemList).not.toBe({});
+    expect(elemList).toBeDefined();
 
       // Dummy properties
       expect(elemList.hasOwnProperty('buttons')).toBeTruthy();
@@ -94,33 +89,32 @@ describe('UIManager', function() {
       expect(elemList.hasOwnProperty('sliders')).toBeTruthy();
       expect(elemList.hasOwnProperty('inputs')).toBeTruthy();
     });
-    
-    it('constructs `rootContainer` jQuery object', function() {
-      expect(uimanager.hasOwnProperty('rootContainer')).toBeTruthy();
-      expect(uimanager.rootContainer instanceof jQuery).toBeTruthy();
-      
-    });
 
-    it('constructs `uiContainer` jQuery object', function() {
-      expect(uimanager.hasOwnProperty('uiContainer')).toBeTruthy();
-      expect(uimanager.uiContainer instanceof jQuery).toBeTruthy();
-    });
+  it('constructs `rootContainer` jQuery object', function() {
+    expect(uimanager.hasOwnProperty('rootContainer')).toBeTruthy();
+    expect(uimanager.rootContainer instanceof jQuery).toBeTruthy();
 
-    it('.initialize() appends `uiContainer` to rootContainer',
-      function() {
-        expect(uimanager.rootContainer.children().length).not.toBe(0);
-        expect(uimanager.uiContainer.children().length).not.toBe(0);
-        expect(uimanager.rootContainer.find(uimanager.uiContainer)
-          .length).not.toBe(0)
-      });
-    it('.initialize() appends `buttons` to rootContainer', function() {
-      expect(uimanager.rootContainer.find('.seq-play-button')[0]).toBeDefined();
-      expect(uimanager.rootContainer.find('.seq-stop-button')[0]).toBeDefined();
-    });   
   });
 
-  xdescribe('.drawElement() method ', function() {
-    
+  it('constructs `uiContainer` jQuery object', function() {
+    expect(uimanager.hasOwnProperty('uiContainer')).toBeTruthy();
+    expect(uimanager.uiContainer instanceof jQuery).toBeTruthy();
+  });
+
+  it('.initialize() appends `uiContainer` to rootContainer',
+    function() {
+      expect(uimanager.rootContainer.children().length).not.toBe(0);
+      expect(uimanager.uiContainer.children().length).not.toBe(0);
+      expect(uimanager.rootContainer.find(uimanager.uiContainer)
+        .length).not.toBe(0)
+    });
+  it('.initialize() appends `buttons` to rootContainer', function() {
+    expect(uimanager.rootContainer.find('.seq-play-button')[0]).toBeDefined();
+    expect(uimanager.rootContainer.find('.seq-stop-button')[0]).toBeDefined();
+  });   
+
+  describe('.drawElement() method ', function() {
+
     beforeEach(function() {
       uic = uimanager.uiContainer;
       spyOn(uimanager, 'drawElement').and.callThrough();
@@ -128,6 +122,8 @@ describe('UIManager', function() {
 
     afterEach(function() {
       uic.empty();
+      /** stop everything that might be running */
+      uimanager.em.emit('uiman:stop');
     });
     
     it('should thow error without if no params provided', function() {
@@ -169,14 +165,14 @@ describe('UIManager', function() {
     });
   });
 
-  xdescribe('.drawElements() method', function() {
-    var sampleList = {
-      "category1" : {
-        'play' : {
-          'class': 'seq-test-button',
-          tagName: 'button',
-          label: 'Test paly',
-          jqEvent: 'click',
+describe('.drawElements() method', function() {
+  var sampleList = {
+    "category1" : {
+      'play' : {
+        'class': 'seq-test-button',
+        tagName: 'button',
+        label: 'Test paly',
+        jqEvent: 'click',
           // component:event or component:toggle:forevent
           // toggles the button play to pause
           emitEvents: ['uiman:play']
@@ -188,11 +184,11 @@ describe('UIManager', function() {
       uic = uimanager.uiContainer;
       spyOn(uimanager, 'drawElements').and.callThrough();
       spyOn(uimanager, 'drawElement').and.callThrough();
-
-      
     });
     afterEach(function() {
       uic.empty();
+      /** stop everything that might be running */
+      uimanager.em.emit('uiman:stop');
     })
 
     it('accepts no params - renders the default elementList', function() {
@@ -224,12 +220,33 @@ describe('UIManager', function() {
       // expect(uimanager.em.emit).toHaveBeenCalled();
     })
   });
-  xdescribe('.drawChannels()', function() {
-    uic = uimanager.uiContainer;
-    beforeEach(function() {
-      spyOn(uimanager, 'drawChannels').and.callThrough();
-    })
-    it('should be called during the .initialize()', function() {
+describe('.drawChannels()', function() {
+
+  it('should by default create 4 channels', function() {
+    $('#sequencer-test-container').empty();
+    UIManager.instance = null;
+    uimanager = UIManager.getInstance(opts);
+    expect(uimanager.channelContainer.children().length).not.toEqual(0)
+  });
+
+  it('each channel consists of 2 parts - controls and patterns', function() {
+    var channels = $("div[class^='seq-channel']");
+    channels.each(function(index, channel) {
+      var children = $(channel).children();
+      expect(children.length).toEqual(2)
+      expect(children[0].className).toMatch('channel-controls');
+      expect(children[1].className).toMatch('channel-pattern');
     });
   });
+
+  it('each channel `pattern` consists of segments', function() {
+    expect($('.channel-pattern').eq(0).find('.pattern-segment').length)
+      .not.toEqual(0);
+  });
+
+  it('each `segment` consists of `segment-items`', function() {
+    expect($('.pattern-segment').eq(0).find('.segment-item').length)
+      .not.toEqual(0);
+  });
+});
 });

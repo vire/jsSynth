@@ -1,15 +1,9 @@
 /* globals  $ */
 
 /**
-* @class - responsible for drawing/rendering items from element list property 
-* into DOM elements, attaching event handlers, subscribing to events. 
-*
-* TODOs: 
-* - add listener for `uiman:stop` event - restore the ui to the initial state
-* - add listener for `uiman:play` event - swap the play button to pause  
-* - add listener for `uiman:pause` event - swap the pause button back to play
-* - add listener for `looper:play` event - to start animating the channel  
-* - add setElementList
+* responsible for drawing/rendering items from element list property into DOM 
+* elements, attaching event handlers, subscribing to events. 
+* @class
 */
 UIManager = (function() {
   'use strict';
@@ -19,7 +13,6 @@ UIManager = (function() {
    * @param {Object} options
    */
   function UIManager(options) {
-    var that = this;
     options = options || {};
     this.rootContainerId = options.rootContainerId ||
       createRootElement();
@@ -40,7 +33,7 @@ UIManager = (function() {
      */
     function createRootElement() {
       var df = document.createElement('div');
-      df.id = "sequencer-root";
+      df.id = 'sequencer-root';
       document.body.insertBefore(df, document.body.childNodes[0]);
     }
   }
@@ -50,7 +43,7 @@ UIManager = (function() {
   // TODO - just for test purposes.
   UIManager.destroy = function() {
     this.instance = null;
-  }
+  };
   
   /**
    * @method UIManager.getInstance - static method for instantiation.
@@ -130,13 +123,13 @@ UIManager = (function() {
     this.drawElements(elemList);
     this.drawChannels();
     
-    /** UIManager API for other components  - dedepends on EventManager */
+    /** UIManager API for other components  - depends on EventManager */
     try {this.em.register({
           'uiman:blinkOnTick' : this.blinkOnTick,
           'looper:tick' : this.highlightItem
         }, null, this);
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   };
 
@@ -189,18 +182,12 @@ UIManager = (function() {
    * @param {Object} elementList
    */
   UIManager.prototype.drawElements = function(elementList) {
-    var that = this;
-
 
     elementList = elementList ||  this.getElementList();
 
     for(var elementgroup in elementList) {
       if(elementList.hasOwnProperty(elementgroup)) {
         var items = elementList[elementgroup];
-
-        if('channels' === elementgroup) {
-          this.drawChannels(elementList[elementgroup]);
-        }
 
         if(0 !== Object.keys(items).length) {
           // iterate through items and draw tem to the UI : )
@@ -216,10 +203,11 @@ UIManager = (function() {
 
   /**
    * Method for highlighting the indicator element, whenever an 
-   * uiman:blinkOnTick event is played is emited.
+   * uiman:blinkOnTick event is played is going to fire.
    * @method UIManager#blinkOnTick
    */
   UIManager.prototype.blinkOnTick = function() {
+
     (function toggle() {
           $('.indicator').addClass('active');
           setTimeout(function() {
@@ -258,7 +246,7 @@ UIManager = (function() {
     } 
 
     /**
-     * jQuery util function to prevent function calling inside a for loop.
+     * jQuery utility function to prevent function calling inside a for loop.
      * @function UIManager~createSegmentElement
      * @param  {string} className [description]
      * @return {Object}           jQuery object
@@ -266,7 +254,7 @@ UIManager = (function() {
     function createSegmentElement(className) {
       return $('<div class=' + className + '>').click(function() {
           $(this).toggleClass('armed');
-      })
+      });
     }   
   };
 
@@ -290,15 +278,20 @@ UIManager = (function() {
     this.addSegmentItems();    
   };
 
+  /**
+   * On every tick from Looper, this fn adds a highlight to the respective
+   * element(item) in the channel's pattern.
+   * @param  {number} index - cursor in looper
+   */
   UIManager.prototype.highlightItem = function(index) {
-    console.log('index',index);
 
-    var item = $('.channel-pattern').find('.segment-item').eq(index);
-    item.addClass('playing');
-    setTimeout(function() {
-      item.removeClass('playing');
-    },500);
-  }
+    var chPatterns = $('.channel-pattern');
+    var allItems = chPatterns.find('.segment-item');
+    var itemsToHighlight = chPatterns.find('.segment-item:eq('+ index +')');
+
+    allItems.not(itemsToHighlight).removeClass('playing');
+    itemsToHighlight.addClass('playing');
+  };
 
   return UIManager;
 })();

@@ -28,6 +28,7 @@ EventManager = (function() {
   }
 
   /**
+   * Subscriber registering interface - either hashObject or single event
    * @method EventManager#register
    * @param  {Object} eventOrEvents
    * @param  {Function} emitFn
@@ -37,14 +38,14 @@ EventManager = (function() {
       this.registerEvents(eventOrEvents, context) : 
       this.registerEvent(eventOrEvents, emitFn, context);
   };
-
+ 
   /**
    * @method EventManager#registerEvents
-   * @param  {Object} eventsObject
+   * @param  {Object} eventsObject p4M614ONU314Zdu
    */
   EventManager.prototype.registerEvents = function(eventsObject, context) {
     var that = this;
-    console.log('registerEvents', eventsObject, context)
+    // console.log('registerEvents', eventsObject, context)
     for(var eventName in eventsObject) {
       if(eventsObject.hasOwnProperty(eventName)) {
         this.registerEvent(eventName, eventsObject[eventName], context);
@@ -94,7 +95,7 @@ EventManager = (function() {
     };
     
     for(i = 0, iMax = subscribers.length; i < iMax; i += 1) {
-      console.log('subscribers[i]', subscribers[i].context)
+      // console.log('subscribers[i]', subscribers[i].context)
       subscribers[i].emitFn.apply(subscribers[i].context, data);
     }
   };
