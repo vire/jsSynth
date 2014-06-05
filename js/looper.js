@@ -11,11 +11,11 @@ Looper = (function() {
    * @param {Object} options - diverse options passed via getInstance
    */
   function Looper(options) {
+    var DEFAULT_NOTE_LENGHT = 16;
     this.cursor = -1;
     this.transitionTimeout = null;
     //  iterate over options and add them to the props?
     options = options || {};
-
     // aka tick interval === how long
     this.tickDuration = options.tickDuration || 1000;
 
@@ -31,6 +31,12 @@ Looper = (function() {
     // loopLenght consists of innerIterations, steps per innerIteration
     this.loopLength = 
       this.innerLoops * this.loopSections * this.loopSectionLegnth;
+
+    this.maxBpm = 600;
+    this.minBpm = 60;
+    this.defaultBpm = 140;
+
+    this.tickDuration = (60000 / this.defaultBpm) / (DEFAULT_NOTE_LENGHT / this.loopSectionLegnth )
 
     this.em = options.em;
 

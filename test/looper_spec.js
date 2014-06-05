@@ -17,7 +17,7 @@ describe('Looper', function() {
     
     beforeEach(function() {
       looper = Looper.getInstance({
-        em: EventManager.getInstance()
+        em: EventManager.getInstance()  
       });      
 
     });
@@ -40,7 +40,7 @@ describe('Looper', function() {
       expect(looper.loopLength).toEqual(16);
       expect(looper.loopSectionLegnth).toEqual(4);
       expect(looper.loopSections).toEqual(4);
-      expect(looper.tickDuration).toEqual(1000);
+      expect(looper.tickDuration).not.toEqual(0);
     });
 
     it('must contain default methods' , function() {

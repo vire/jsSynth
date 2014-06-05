@@ -220,33 +220,53 @@ describe('.drawElements() method', function() {
       // expect(uimanager.em.emit).toHaveBeenCalled();
     })
   });
-describe('.drawChannels()', function() {
+  describe('.drawChannels()', function() {
 
-  it('should by default create 4 channels', function() {
-    $('#sequencer-test-container').empty();
-    UIManager.instance = null;
-    uimanager = UIManager.getInstance(opts);
-    expect(uimanager.channelContainer.children().length).not.toEqual(0)
-  });
+    it('should by default create 4 channels', function() {
+      $('#sequencer-test-container').empty();
+      UIManager.instance = null;
+      uimanager = UIManager.getInstance(opts);
+      expect(uimanager.channelContainer.children().length).not.toEqual(0)
+    });
 
-  it('each channel consists of 2 parts - controls and patterns', function() {
-    var channels = $("div[class^='seq-channel']");
-    channels.each(function(index, channel) {
-      var children = $(channel).children();
-      expect(children.length).toEqual(2)
-      expect(children[0].className).toMatch('channel-controls');
-      expect(children[1].className).toMatch('channel-pattern');
+    it('each channel consists of 2 parts - controls and patterns', function() {
+      var channels = $("div[class^='seq-channel']");
+      channels.each(function(index, channel) {
+        var children = $(channel).children();
+        expect(children.length).toEqual(2)
+        expect(children[0].className).toMatch('channel-controls');
+        expect(children[1].className).toMatch('channel-pattern');
+      });
+    });
+
+    it('each channel `pattern` consists of segments', function() {
+      expect($('.channel-pattern').eq(0).find('.pattern-segment').length)
+      .not.toEqual(0);
+    });
+
+    it('each `segment` consists of `segment-items`', function() {
+      expect($('.pattern-segment').eq(0).find('.segment-item').length)
+      .not.toEqual(0);
     });
   });
+  describe('.drawInputs()', function() {
+    var signatureWrapper;
 
-  it('each channel `pattern` consists of segments', function() {
-    expect($('.channel-pattern').eq(0).find('.pattern-segment').length)
-      .not.toEqual(0);
-  });
+    it('must add `signature` wrapper', function() {
+      signatureWrapper = $('.seq-signature');
+      expect(signatureWrapper.length).toEqual(1)
+    });
+    
+    it('must add two inputs into the signature wrapper', function() {
 
-  it('each `segment` consists of `segment-items`', function() {
-    expect($('.pattern-segment').eq(0).find('.segment-item').length)
-      .not.toEqual(0);
+      expect(signatureWrapper.find('.seq-loopsection-input').length)
+        .toEqual(1);
+      expect(signatureWrapper.find('.seq-loopsectionlength-input').length)
+        .toEqual(1);
+    });
+
+    it('must add a bpm input', function() {
+      expect($('.seq-bpm-input').length).toEqual(1);
+    });
   });
-});
 });

@@ -122,7 +122,9 @@ UIManager = (function() {
     var elemList = this.getElementList();
     this.drawElements(elemList);
     this.drawChannels();
-    
+
+
+    this.drawInputs();
     /** UIManager API for other components  - depends on EventManager */
     try {this.em.register({
           'uiman:blinkOnTick' : this.blinkOnTick,
@@ -292,6 +294,28 @@ UIManager = (function() {
     allItems.not(itemsToHighlight).removeClass('playing');
     itemsToHighlight.addClass('playing');
   };
+
+  UIManager.prototype.drawInputs = function() {
+    var defalultBpmValue = 140;
+    var loopsection = 4;
+    var loopsectionlength = 4;
+    var bpmInput = $('<span class=\'seq-bpm\'>');
+    bpmInput.append('<label for=\'bpm\'>BPM</label>');
+    bpmInput.append('<input type=\'text\' class=\'seq-bpm-input\' '+
+      ' value=' + defalultBpmValue + ' name=\'bpm\' />');
+
+    
+    var signatureInput = $('<span class=\'seq-signature\'>');
+    signatureInput.append('<label for=\'signature\'>Signature</label>');
+    signatureInput.append('<input type=\'text\' class=\'seq-loopsection-input\' '+
+      ' value=' + loopsection + ' name=\'signature\' /> / ');
+    signatureInput.append('<input type=\'text\' class=\'seq-loopsectionlength-input\' '+
+      ' value=' + loopsectionlength + ' name=\'signature\' />');
+
+    this.uiContainer.append(signatureInput);
+    this.uiContainer.append(bpmInput);
+  }
+
 
   return UIManager;
 })();

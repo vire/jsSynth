@@ -87,3 +87,12 @@
   width: 11px;
   height: 24px
 }
+
+.seq-loopsection-input, 
+.seq-loopsectionlength-input {
+  width: 20px;
+}
+
+.seq-bpm-input {
+  width: 30px;
+}
