@@ -1,7 +1,15 @@
+*, *:before, *:after {
+    -webkit-box-sizing: border-box; /* Needed for mobile WebKit */
+    -moz-box-sizing: border-box; /* Needed for Firefox */
+    box-sizing: border-box
+}
+
 #seq-channel-container {
-/*  width: 400px;
-  height: 150px;
-  background: red;*/
+  min-width: 100%;
+}
+
+#ui-container {
+  max-width: 100%
 }
 
 .channel-controls {
@@ -11,6 +19,9 @@
   background: #979797;
 }
 
+div[class^='seq-channel'] {
+  display: inline-block;
+}
 
 .channel-controls .indicator {
   height: 28px;

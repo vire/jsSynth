@@ -1,0 +1,12 @@
+{
+  "framework": "jasmine2",
+  "src_files": [
+    "./js/**.js",
+    "./js/vendor/jquery.min.js",
+    "./js/vendor/jquery.tmpl.min.js",
+    "./js/vendor/**.js",
+    "./js/src/**.js",
+    "./test/bind_polyfill.js",
+	"./test/uimanager_spec.js"
+  ]
+}
