@@ -1,7 +1,7 @@
 *, *:before, *:after {
-    -webkit-box-sizing: border-box; /* Needed for mobile WebKit */
-    -moz-box-sizing: border-box; /* Needed for Firefox */
-    box-sizing: border-box
+  -webkit-box-sizing: border-box; /* Needed for mobile WebKit */
+  -moz-box-sizing: border-box; /* Needed for Firefox */
+  box-sizing: border-box
 }
 
 #seq-channel-container {
@@ -15,20 +15,23 @@
 .channel-controls {
   height: 30px;
   width: 20%;
-  float: left;
-  background: #979797;
+  display: inline-block;
+  background: #565656;;
 }
 
 div[class^='seq-channel'] {
   display: inline-block;
+  min-width: 100%;
+  
 }
 
 .channel-controls .indicator {
-  height: 28px;
+  height: 10px;
   width: 10px;
-  margin: 1px 5px;
-  background: #979797;
+  margin: 9px 5px;
+  background: #FF6B6B;
   float: right;
+  border-radius: 5px;
 }
 
 .channel-controls .indicator.active {
@@ -43,7 +46,8 @@ div[class^='seq-channel'] {
   }*/
 
   .channel-pattern {
-    height: 31px;
+    height: 30px;
+    display: inline-block;
 /*  background: wheat;
   width: 70%;
   border-bottom: 1px solid;
@@ -51,11 +55,10 @@ div[class^='seq-channel'] {
 }
 
 .pattern-segment {
-  background: ;
-  width: 70px;
-  float:left;
+  float: left;
   height: 30px;
-  display: block;
+  display: inline-block;
+  border-left: 1px solid black;
 }
 
 .pattern-segment:nth-child(odd) {
@@ -66,37 +69,35 @@ div[class^='seq-channel'] {
 }
 
 .segment-item {
-  height: 28px;
-  margin: 1px 0 0 2px;
+  display: inline-block;
+  height: 100%;
   width: 15px;
-  display: block;
-  float: left;
+
 }
 
 .segment-item.armed {
   border: 3px solid #E4E49F;
-  width: 9px;
-  height: 22px;
+/*  width: 9px;
+height: 22px;*/
 }
 
 .segment-item:nth-child(odd) {
-  background: #87CEEB;
+  background: #C6C6C6;
 }
 .segment-item:nth-child(even) {
-  background: gray;
+  background: #8E8E8E;
 }
 
 .segment-item.armed:nth-child(odd) {
-  border: 3px solid #E4E49F;
+  border: 3px solid #EE5F5F;
 }
 .segment-item.armed:nth-child(even) {
-  border: 3px solid #4DDD75;
+  border: 3px solid #EE5F5F;
 }
 
 .segment-item.playing {
-  border: 2px solid red;
-  width: 11px;
-  height: 24px
+  /*border: 2px solid red;*/
+  background: #D8FC68;
 }
 
 .seq-loopsection-input, 

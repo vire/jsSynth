@@ -268,15 +268,25 @@ UIManager = (function() {
    */
   UIManager.prototype.drawChannels = function(num) {
     var chCnt = num || this.defaultChannelCount;
-    var i;
+    var compileSigStr, stringTmpl, i, obj;
 
+    stringTmpl = '<div class=\'seq-channel-{{idx}}\'>' + 
+        '<div class={{controlsClass}}>'+
+        '<div class={{indicatorClass}}></div></div>' + 
+        '<div class={{patternClass}}></div></div>'
+
+    compileSigStr = Handlebars.compile(stringTmpl);
+    
+    obj = {
+      controlsClass: 'channel-controls',
+      indicatorClass: 'indicator',
+      patternClass: 'channel-pattern'
+    };
+    
     for(i = 0; i < chCnt; i +=1) {
-      var channelTemplate = $('<div class=\'seq-channel-0'+ i +'\'>' + 
-        '<div class=\'channel-controls\'><div class=\'indicator\'></div></div>' + 
-        '<div class=\'channel-pattern\'></div></div>');
-      this.channelContainer.append(channelTemplate);
+      obj.idx = i;
+      this.channelContainer.append(compileSigStr(obj));
     }
-
     this.addSegments();
     this.addSegmentItems();    
   };
@@ -304,21 +314,32 @@ UIManager = (function() {
     var defalultBpmValue = 140;
     var loopsection = 4;
     var loopsectionlength = 4;
-    var bpmInput = $('<span class=\'seq-bpm\'>');
-    bpmInput.append('<label for=\'bpm\'>BPM</label>');
-    bpmInput.append('<input type=\'text\' class=\'seq-bpm-input\' '+
-      ' value=' + defalultBpmValue + ' name=\'bpm\' />');
 
-    
-    var signatureInput = $('<span class=\'seq-signature\'>');
-    signatureInput.append('<label for=\'signature\'>Signature</label>');
-    signatureInput.append('<input type=\'text\' class=\'seq-loopsection-input\' '+
-      ' value=' + loopsection + ' name=\'signature\' /> / ');
-    signatureInput.append('<input type=\'text\' class=\'seq-loopsectionlength-input\' '+
-      ' value=' + loopsectionlength + ' name=\'signature\' />');
+    var signStr = '<span class={{signatureClass}}>' + 
+      '<label for={{iName}}>{{labelText}}</label>' + 
+      '<input type={{iType}} class={{iClass}} value={{iValue}} ' + 
+      'name={{iName}}> / <input type={{iType}} class={{jClass}} ' +
+      'value={{jValue}} name={{iName}}></span><span class={{bpmSpanClass}}>' +
+      '<label for={{bpmName}}>BPM</label>' +
+      '<input type={{iType}} class={{bpmInputClass}} value={{bpmVal}} ' +
+      'name={{bpmName}}></span>';
 
-    this.uiContainer.append(signatureInput);
-    this.uiContainer.append(bpmInput);
+    var compileSigStr = Handlebars.compile(signStr);
+    var tmplValues = {
+      signatureClass: 'seq-signature',
+      bpmSpanClass: 'seq-bpm',
+      bpmInputClass: 'seq-bpm-input',
+      bpmVal: defalultBpmValue,
+      bpmName: 'bpm',
+      iName: 'signature',
+      labelText: 'Signature',
+      iType: 'text',
+      iClass: 'seq-loopsection-input',
+      jClass: 'seq-loopsectionlength-input',
+      iValue: loopsection,
+      jValue: loopsectionlength
+    }
+    this.uiContainer.append(compileSigStr(tmplValues));
   }
 
 
