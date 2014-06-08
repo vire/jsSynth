@@ -28,6 +28,26 @@ appendTestContainer();
   'emit' : function() {}
 }
 
+function populateHowler() {
+   window.soundFn = new Howl({
+     urls:['media/sounds.mp3'],
+     sprite: {
+       blast: [0,2000],
+       laser: [3000, 700],
+       random: [5000, 500],
+       unrandom: [7000, 1000]
+     }
+   });
+   window.soundsToPlay = [
+    function() {
+      return window.soundFn.play('blast')
+    }
+   ]
+   window.SoundArray = ['blast', 'laser', 'random', 'unrandom'];
+}
+
+populateHowler();
+
 eventManager = EventManager.getInstance();
 
 looper = Looper.getInstance({em: eventManager});

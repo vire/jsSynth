@@ -97,6 +97,13 @@ UIManager = (function() {
           label: 'Stop',
           jqEvent: 'click',
           emitEvents: ['uiman:stop']
+        },
+        'clear': {
+          'class': 'seq-clear-button',
+          tagName: 'button',
+          label: 'Clear',
+          jqEvent: 'click',
+          emitEvents: ['uiman:clear']
         }
       },
       'knobs': {},
@@ -129,7 +136,8 @@ UIManager = (function() {
     try {this.em.register({
           'uiman:blinkOnTick' : this.blinkOnTick,
           'looper:tick' : this.highlightItem,
-          'uiman:stop' : this.removeHighlight
+          'uiman:stop' : this.removeHighlight,
+          'uiman:clear' : this.removeArmed,
         }, null, this);
     } catch (e) {
       console.error(e);
@@ -178,6 +186,15 @@ UIManager = (function() {
   // reaction on the looper tick event
   UIManager.prototype.updateOnTick = function(loopCursor) {};
 
+  /**
+   * Simply removes the armed class from segment items, this is trigged on
+   * uiman:clear event by the clear button.
+   * @method  UIManager#removeArmed
+   * @return {[type]} [description]
+   */
+  UIManager.prototype.removeArmed = function() {
+    return this.uiContainer.find('.armed').removeClass('armed');
+  }
   /**
    * Iterates over the list of elements (Object and elemes as properties) 
    * and passes them to the drawElement fn.
@@ -304,6 +321,20 @@ UIManager = (function() {
 
     allItems.not(itemsToHighlight).removeClass('playing');
     itemsToHighlight.addClass('playing');
+
+    // TODO - logic for playing sounds
+    // finds the elements to play via hasClass .armed
+    // then find the appropriate channel id
+    // trigger sound event on corresponding sound array
+    if(itemsToHighlight.hasClass('armed')) {
+      var channelsToPlay = itemsToHighlight.filter($('.armed'))
+        .parent().parent().parent();
+
+      channelsToPlay.each(function(z,e) {
+        // console.log('Play tone array index: ',e.className.substr(12));
+        window.soundFn.play(window.SoundArray[e.className.substr(12)])
+      })
+    }
   };
 
   UIManager.prototype.removeHighlight = function() {

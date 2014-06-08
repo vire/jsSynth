@@ -34,6 +34,7 @@ This project is currently dependendent on the following 3rd party libraries:
 * [Q - asynchronous promises](https://github.com/kriskowal/q) - MIT 
 * [jsdoc](https://github.com/jsdoc3/jsdoc) - Apache 2.0
 * [DocStrap](https://github.com/terryweiss/docstrap) - MIT
+* [howler](https://github.com/goldfire/howler.js/) - MIT
 
 ## License
 
