@@ -16,7 +16,16 @@
   height: 30px;
   width: 20%;
   display: inline-block;
-  background: #565656;;
+  background: #565656;
+  overflow: hidden;
+}
+
+.channel-label {
+  display: inline;
+  vertical-align: sub;
+  margin-left: 0.5em;
+  color: #FAFAFA;
+  font-size: 1em;
 }
 
 div[class^='seq-channel'] {

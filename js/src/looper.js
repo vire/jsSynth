@@ -124,7 +124,6 @@ Looper = (function() {
   /**
    * Puses the looper === set looping to false.
    * @method  Looper#pause
-   * @return {[type]} [description]
    */
   Looper.prototype.pause = function() {
     this.looping = false;

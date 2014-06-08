@@ -38,11 +38,6 @@ function populateHowler() {
        unrandom: [7000, 1000]
      }
    });
-   window.soundsToPlay = [
-    function() {
-      return window.soundFn.play('blast')
-    }
-   ]
    window.SoundArray = ['blast', 'laser', 'random', 'unrandom'];
 }
 

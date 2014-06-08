@@ -190,7 +190,6 @@ UIManager = (function() {
    * Simply removes the armed class from segment items, this is trigged on
    * uiman:clear event by the clear button.
    * @method  UIManager#removeArmed
-   * @return {[type]} [description]
    */
   UIManager.prototype.removeArmed = function() {
     return this.uiContainer.find('.armed').removeClass('armed');
@@ -286,10 +285,10 @@ UIManager = (function() {
   UIManager.prototype.drawChannels = function(num) {
     var chCnt = num || this.defaultChannelCount;
     var compileSigStr, stringTmpl, i, obj;
-
+    var channelLabels = ['blast','laser','speech','junk'];
     stringTmpl = '<div class=\'seq-channel-{{idx}}\'>' + 
-        '<div class={{controlsClass}}>'+
-        '<div class={{indicatorClass}}></div></div>' + 
+        '<div class={{controlsClass}}><span class={{labelClass}}>'+
+        '{{labelText}}</span><div class={{indicatorClass}}></div></div>' + 
         '<div class={{patternClass}}></div></div>'
 
     compileSigStr = Handlebars.compile(stringTmpl);
@@ -297,11 +296,14 @@ UIManager = (function() {
     obj = {
       controlsClass: 'channel-controls',
       indicatorClass: 'indicator',
-      patternClass: 'channel-pattern'
+      patternClass: 'channel-pattern',
+      labelClass: 'channel-label',
+      
     };
     
     for(i = 0; i < chCnt; i +=1) {
       obj.idx = i;
+      obj.labelText = channelLabels[i];
       this.channelContainer.append(compileSigStr(obj));
     }
     this.addSegments();
