@@ -34,11 +34,11 @@ function populateHowler() {
      sprite: {
        blast: [0,2000],
        laser: [3000, 700],
-       random: [5000, 500],
-       unrandom: [7000, 1000]
+       speech: [5000, 500],
+       junk: [7000, 1000]
      }
    });
-   window.SoundArray = ['blast', 'laser', 'random', 'unrandom'];
+   window.SoundArray = ['blast', 'laser', 'speech', 'junk'];
 }
 
 populateHowler();
@@ -264,6 +264,7 @@ describe('.drawElements() method', function() {
       .not.toEqual(0);
     });
   });
+
   describe('.drawInputs()', function() {
     var signatureWrapper;
 
@@ -283,5 +284,43 @@ describe('.drawElements() method', function() {
     it('must add a bpm input', function() {
       expect($('.seq-bpm-input').length).toEqual(1);
     });
+
+    it('must add a bpm up button', function() {
+      expect($('.bpm-button-up').length).toEqual(1);
+    });
+
+    it('must add a bpm down button', function() {
+      expect($('.bpm-button-down').length).toEqual(1);
+    });
+  });
+  describe('.updateBPM()', function() {
+
+    beforeEach(function() {
+      spyOn(uimanager, 'updateBPM').and.callThrough();
+    });
+
+    it('must trigger, tempo +1 by clicking bpm-button-up', function() {
+      
+      $('.bpm-button-up').click();
+      expect(uimanager.updateBPM).toHaveBeenCalled();
+      expect(parseInt($('.seq-bpm-input').val())).toEqual(141);
+    });
+    it('must trigger, tempo -1 by clicking bpm-button-down', function() {
+      $('.bpm-button-down').click();
+      expect(uimanager.updateBPM).toHaveBeenCalled();
+      expect(parseInt($('.seq-bpm-input').val())).toEqual(140);
+    });
+    it('must trigger, on `seq-bpm-input` focusout - ok val', function() {
+      $('.seq-bpm-input').val('150');
+      $('.seq-bpm-input').trigger('focusout');
+      expect(uimanager.updateBPM).toHaveBeenCalled();
+      expect(parseInt($('.seq-bpm-input').val())).toEqual(150);
+    })
+    it('must trigger, on `seq-bpm-input` focusout - wrong val', function() {
+      $('.seq-bpm-input').val('asd');
+      $('.seq-bpm-input').trigger('focusout');
+      expect(uimanager.updateBPM).toHaveBeenCalled();
+      expect(parseInt($('.seq-bpm-input').val())).toEqual(140);
+    })
   });
 });

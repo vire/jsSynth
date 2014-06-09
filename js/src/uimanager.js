@@ -343,10 +343,15 @@ UIManager = (function() {
     return $('.segment-item').removeClass('playing');
   }
 
+  /**
+   * Draw several input elements.
+   * @method UIManager#drawInputs 
+   */
   UIManager.prototype.drawInputs = function() {
-    var defalultBpmValue = 140;
-    var loopsection = 4;
-    var loopsectionlength = 4;
+    var self = this, 
+      defalultBpmValue = 140, 
+      loopsection = 4, 
+      loopsectionlength = 4;
 
     var signStr = '<span class={{signatureClass}}>' + 
       '<label for={{iName}}>{{labelText}}</label>' + 
@@ -355,7 +360,9 @@ UIManager = (function() {
       'value={{jValue}} name={{iName}}></span><span class={{bpmSpanClass}}>' +
       '<label for={{bpmName}}>BPM</label>' +
       '<input type={{iType}} class={{bpmInputClass}} value={{bpmVal}} ' +
-      'name={{bpmName}}></span>';
+      'name={{bpmName}}></span>' + 
+      '<button class=\'bpm-button-up\'>+</button>' + 
+      '<button class=\'bpm-button-down\'>-</button>';
 
     var compileSigStr = Handlebars.compile(signStr);
     var tmplValues = {
@@ -373,8 +380,32 @@ UIManager = (function() {
       jValue: loopsectionlength
     }
     this.uiContainer.append(compileSigStr(tmplValues));
-  }
 
+    var bpmInput = $('.seq-bpm-input'); 
+    /** add a BPM input watcher if changes occur */
+    bpmInput.focusout(function() {
+      var bpmInputVal = parseInt($(this).val());
+      if(isNaN(bpmInputVal)) {
+        self.updateBPM(bpmInput, defalultBpmValue)
+      } else if(defalultBpmValue !== bpmInputVal) {
+        self.updateBPM(bpmInput, bpmInputVal);
+      }
+    });
+
+    $('.bpm-button-up').click(function() {
+      self.updateBPM(bpmInput,parseInt(bpmInput.val()) + 1);
+    });
+    $('.bpm-button-down').click(function() {
+      self.updateBPM(bpmInput,parseInt(bpmInput.val()) - 1);
+    });
+  };
+
+  UIManager.prototype.updateBPM = function(bpmElem, newTempo) {
+    var self = this;
+    newTempo = 'number' === typeof newTempo ? newTempo : 140; 
+    bpmElem.val(newTempo);
+    self.em.emit('uiman:tempochange', newTempo);
+  }
 
   return UIManager;
 })();
