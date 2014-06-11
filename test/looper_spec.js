@@ -101,6 +101,18 @@ describe('Looper', function() {
       looper.start();
       expect(looper.tick.calls.count()).toEqual(1)
       expect(looper.cursor).toEqual(0);
-    })
+    });
+    it('.updateTickDuration() changes tempo', function() {
+      var minuteMs = 60000,
+        oldBPM = 140,
+        newBPM = 176,
+        initialTickDuration = (minuteMs / oldBPM) / (16 / 4),
+        changedTickDuration = (minuteMs / newBPM) / (16 / 4);
+      spyOn(looper, 'updateTickDuration').and.callThrough();
+      expect(looper.tickDuration).toEqual(initialTickDuration);
+      looper.updateTickDuration(176);
+      expect(looper.updateTickDuration).toHaveBeenCalled();
+      expect(looper.tickDuration).toEqual(changedTickDuration);
+    });
   });
 });

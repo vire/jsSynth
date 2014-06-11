@@ -11,7 +11,7 @@ Looper = (function() {
    * @param {Object} options - diverse options passed via getInstance
    */
   function Looper(options) {
-    var DEFAULT_NOTE_LENGHT = 16;
+    this.DEFAULT_NOTE_LENGHT = 16;
     this.cursor = -1;
     this.transitionTimeout = null;
     //  iterate over options and add them to the props?
@@ -36,7 +36,8 @@ Looper = (function() {
     this.minBpm = 60;
     this.defaultBpm = 140;
 
-    this.tickDuration = (60000 / this.defaultBpm) / (DEFAULT_NOTE_LENGHT / this.loopSectionLegnth )
+    this.tickDuration = (60000 / this.defaultBpm) / 
+      (this.DEFAULT_NOTE_LENGHT / this.loopSectionLegnth )
 
     this.em = options.em;
 
@@ -44,7 +45,8 @@ Looper = (function() {
       this.em.register({
         'uiman:play' : this.start,
         'uiman:pause' : this.pause,
-        'uiman:stop' : this.stop
+        'uiman:stop' : this.stop,
+        'uiman:tempochange': this.updateTickDuration
       }, null, this)
     }
     catch (e) {
@@ -137,6 +139,11 @@ Looper = (function() {
    */
   Looper.prototype.resetCursor = function() {
     this.cursor = -1;
+  };
+
+  Looper.prototype.updateTickDuration = function(newBPM) {
+    this.tickDuration = (60000 / newBPM) / 
+      (this.DEFAULT_NOTE_LENGHT / this.loopSectionLegnth);
   };
 
   return Looper;
