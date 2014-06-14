@@ -1,4 +1,4 @@
-describe('Sequencer', function() {
+xdescribe('Sequencer', function() {
   it('class should exists', function() {
     expect(Sequencer).toBeDefined();
     expect(Sequencer.prototype.constructor.name).toBe('Sequencer')

@@ -24,6 +24,7 @@ UIManager = (function() {
     this.defaultChannelCount = 4;
     this.rootContainer = $('#'+ this.rootContainerId);
     this.em = options.em;
+    
     this.initialize();
 
     /**
@@ -32,9 +33,15 @@ UIManager = (function() {
      * @method  UIManager~createRootElement
      */
     function createRootElement() {
-      var df = document.createElement('div');
-      df.id = 'sequencer-root';
-      document.body.insertBefore(df, document.body.childNodes[0]);
+
+      if(!document.getElementById('sequencer-root')) {
+        var df = document.createElement('div');
+        df.id = 'sequencer-root';
+        document.body.insertBefore(df, document.body.firstChild);
+        return df.id;
+      } else {
+        return 'sequencer-root';
+      }
     }
   }
 
@@ -334,7 +341,12 @@ UIManager = (function() {
 
       channelsToPlay.each(function(z,e) {
         // console.log('Play tone array index: ',e.className.substr(12));
-        window.soundFn.play(window.SoundArray[e.className.substr(12)])
+        // window.soundFn.play(window.SoundArray[e.className.substr(12)])
+        // this.playSound(z);
+        synth.play(z * 50  + 100 );
+        setTimeout(function() {
+          synth.stop(z * 50  + 100 );
+        }, 200)
       })
     }
   };

@@ -1,5 +1,6 @@
+/*global EventManager:true */
 EventManager = (function() {
-  
+  'use strict';
   EventManager.instance = null;
 
   /**
@@ -21,14 +22,14 @@ EventManager = (function() {
     return this.instance != null ? this.instance 
       : this.instance = (function(func, args, ctor) {
         ctor.prototype = func.prototype;
-        var param = [{iw: true}].concat(Array.prototype.slice.call(args, 0))
+        var param = [{iw: true}].concat(Array.prototype.slice.call(args, 0));
         var child = new ctor, result = func.apply(child, param);
         return Object(result) === result ? result : child;
       })(this, arguments, function(){});
-  }
+  };
 
   /**
-   * Subscriber registering interface - either hashObject or single event
+   * Subscriber registering Interface - either hashObject or single event
    * @method EventManager#register
    * @param  {Object} eventOrEvents
    * @param  {Function} emitFn
@@ -61,7 +62,7 @@ EventManager = (function() {
   EventManager.prototype.registerEvent = function(eventName, emitFn, context) {
     if(!eventName && 'function' !== typeof emitFn) {
       throw 'You must pass eventName a emitFn to registerEvent()';
-    };
+    }
 
     var subscribers = this.registeredSubs[eventName];
 
@@ -72,11 +73,15 @@ EventManager = (function() {
     subscribers.push({emitFn: emitFn, context: context});
   };
 
+  /**
+   * If needed in the future removing/ deregistering events.
+   */
   EventManager.prototype.deregister = function() {
 
   };
 
   /**
+   * Dispatcher fn. dispatches the eventName to all registered subscribers.
    * @method EventManager#emit
    * @param  {string} eventName
    * @param  {Array | Object} data
@@ -86,16 +91,14 @@ EventManager = (function() {
     var i, iMax;
     var context = this; // todo add context passing
     var subscribers = this.registeredSubs[eventName];
-    var data = "[object Array]" === Object.prototype.toString.call(data) ?
-      data :
-      [data]
+    var data = '[object Array]' === Object.prototype.toString.call(data) ?
+      data : [data];
 
     if(!subscribers) {
       return;
-    };
+    }
     
     for(i = 0, iMax = subscribers.length; i < iMax; i += 1) {
-      // console.log('subscribers[i]', subscribers[i].context)
       subscribers[i].emitFn.apply(subscribers[i].context, data);
     }
   };

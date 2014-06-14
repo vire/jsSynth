@@ -6,15 +6,20 @@
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="css/main.css">
     <title>recrof's Subtractive playground</title>
-    <script type="text/javascript" src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/qwerty-hancock.js"></script>
-    <script type="text/javascript" src="js/jquery.tmpl.min.js"></script>
-    <script type="text/javascript" src="js/wavetables.js"></script>
-    <script type="text/javascript" src="js/presets.js"></script>
+    <script type="text/javascript" src="js/vendor/jquery.min.js"></script>
+    <script type="text/javascript" src="js/vendor/qwerty-hancock.js"></script>
+    <script type="text/javascript" src="js/vendor/jquery.tmpl.min.js"></script>
+    <script type="text/javascript" src="js/src/wavetables.js"></script>
+    <script type="text/javascript" src="js/src/presets.js"></script>
 
-    <script type="text/javascript" src="js/synth.js"></script>
+    <script type="text/javascript" src="js/src/synth.js"></script>
+    <!-- sequencer sources-->
 
-
+    <script type="text/javascript" src="js/vendor/handlebars.min.js"></script>
+    <script type="text/javascript" src="js/src/eventmanager.js"></script>
+    <script type="text/javascript" src="js/src/looper.js"></script>
+    <script type="text/javascript" src="js/src/uimanager.js"></script>
+    <script type="text/javascript" src="js/src/sequencer.js"></script>
 
     <script type="text/html" id="SynthControlsTemplate">
     <div class="panel" id="osc${id}_panel">
@@ -33,7 +38,7 @@
     <div width="100%">
             <div id="keyboard"></div>
     </div>
-
+    <div id="sequencer-root"></div>
     <div class="panel_group container_left" id="oscillators">
     </div>
     <div class="panel_group">
@@ -113,5 +118,14 @@ for(var i=0; i&lt;4096;) {
 </div>
 </div>
 <small class="body">ideas? thoughts? <a href="mailto:forcer@vnet.sk">send me a mail</a></small>
+<script type='text/javascript'>
+    (function() {
+      try {
+        Sequencer.getInstance(EventManager, Looper, UIManager)
+    } catch(e) {
+        console.error('Error on initializing Sequencer: ', e);
+    }
+})();
+</script>
 </body>
 </html>

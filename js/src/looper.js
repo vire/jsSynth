@@ -1,6 +1,7 @@
 /**
 * @class - responsible for iteration and sequence logic.
-* Heavily inspired by the {@link https://github.com/michd/step-sequencer/blob/master/assets/js/tempo.js}
+* Heavily inspired by the 
+* {@link https://github.com/michd/step-sequencer/blob/master/assets/js/tempo.js}
 */
 Looper = (function() {
   'use strict';
@@ -11,21 +12,40 @@ Looper = (function() {
    * @param {Object} options - diverse options passed via getInstance
    */
   function Looper(options) {
-    this.DEFAULT_NOTE_LENGHT = 16;
-    this.cursor = -1;
-    this.transitionTimeout = null;
-    //  iterate over options and add them to the props?
+
+    /** overwrite with an empty hash if no options are present */
     options = options || {};
-    // aka tick interval === how long
+    
+    /** EventManager instance required! */
+    this.em = options.em;
+
+    /** cursor is by default on -1 offset */
+    this.cursor = -1;
+    
+    /** this acts as calibration constant for the 4/4 verse */
+    this.DEFAULT_NOTE_LENGHT = 16;
+    
+    /** this instance var stores the timer to be cleared */
+    this.transitionTimeout = null;
+
+    /** TODO: remove when not necesary anymore */
     this.tickDuration = options.tickDuration || 1000;
 
-    // abstraction of measures
+    /** 
+    * InnerLoops prop defines how many measures are created by default
+    * TODO: addMeasure || updateMeasures method needs to be implemented!
+    */
     this.innerLoops = options.innerLoops || 1;
-    
-    // beats per loop
+  
+    /** 
+     * beat per loop/bar/measure {loopSections}/x
+     * See wiki time signature
+     * {@link http://en.wikipedia.org/wiki/Time_signature}
+     * @type {number}
+     */
     this.loopSections = options.loopSections || 4;
     
-    // notes per beat
+    /** notes per beat x/{loopSectionLegnth}, note value 1/4 === quarter */
     this.loopSectionLegnth = options.loopSectionLegnth || 4;
 
     // loopLenght consists of innerIterations, steps per innerIteration
@@ -38,8 +58,6 @@ Looper = (function() {
 
     this.tickDuration = (60000 / this.defaultBpm) / 
       (this.DEFAULT_NOTE_LENGHT / this.loopSectionLegnth )
-
-    this.em = options.em;
 
     try {
       this.em.register({
@@ -55,6 +73,7 @@ Looper = (function() {
   }
 
   /**
+   * Singleton instance obtain method.
    * @method Looper.getInstance
    * @return {Object} - the Looper instance
    */

@@ -1,53 +1,60 @@
 var Sequencer;
 
 /**
-* TODOs:
-* add channel support - type of channel, binds to a sound playable instance
-* add pattern per channel (array of object with state active/inactive, type)
-* implement run method - moves the cursor per channel's pattern 
-* implement BPM, timing, notes, tempo
+* Factory that creates an default sequencer into a given DOM container.
+* @class Sequencer
 */
 Sequencer = (function() {
-  function Sequencer(name, bars, tracks) {
-    this.name = name || '';
-    this.tracks = tracks || 4;
-    this.bars = bars || [];
-    this.isPlaying = false;
+  Sequencer._instance = null;
+
+  /**
+   * @constructor
+   * @param {Function} EventManagerClass [description]
+   * @param {Function} LooperClass       [description]
+   * @param {Function} UiManagerClass    [description]
+   * @param {Function} optionsHash       [description]
+   */
+  function Sequencer(EventManagerClass, LooperClass, UiManagerClass, optionsHash) {
+    this.name = name || 'Sequencer';
+
+    this.eventManager = null;
+    this.looper = null;
+    this.uiManager = null;
+    
+    /**
+     * Composes all together
+     * @method  Sequencer#main
+     */
+    this.main = function() {
+      // TODO - define options for each component!!!
+      this.eventManager = EventManagerClass.getInstance();
+
+      // those two require eventManager on instantiation time;
+      this.looper = LooperClass.getInstance({
+        em : this.eventManager
+      });
+      this.uiManager = UiManagerClass.getInstance({
+        em : this.eventManager
+      });
+    }
+
+    /**  autoinitialize! */
+    this.main();
   }
 
-  Sequencer.prototype.cursor = 'position in bars and bar';
-
-  Sequencer.prototype.getCursor = function() {
-    throw new Error("not yet implemented")
-;  };
-
-  Sequencer.prototype.start = function() {
-    return this.isPlaying = true;
-  };
-
-  Sequencer.prototype.stop = function() {
-    return this.isPlaying = false;
-  };
-
-  Sequencer.prototype.pause = function() {
-    throw new Error("not yet implemented");
-  };
-
-  Sequencer.prototype.addTrack = function() {
-    throw new Error("not yet implemented");
-  };
-
-  Sequencer.prototype.removeTrack = function(id) {
-    throw new Error("NYI");
-  };
-
-  Sequencer.prototype.addBar = function() {
-    throw new Error("not yet implemented");
-  };
-
-  Sequencer.prototype.removeBar = function() {
-    throw new Error("not yet implemented");
-  };
+  /**
+   * Static init method to obtain new or already existing instance.
+   * @method  Sequencer.getInstance
+   * @return {Object} sequencer instance
+   */
+  Sequencer.getInstance = function() {
+    return this._instance != null ? this._instance :
+      this._instance = (function(func, args, ctor) {
+        ctor.prototype = func.prototype;
+        var child = new ctor, result = func.apply(child, args);
+        return Object(result) === result ? result : child;
+      })(this, arguments, function() {});
+  }
 
   return Sequencer;
 
