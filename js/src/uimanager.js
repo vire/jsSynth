@@ -15,7 +15,7 @@ UIManager = (function() {
   function UIManager(options) {
     options = options || {};
     this.rootContainerId = options.rootContainerId ||
-      createRootElement();
+      this.createRootElement();
     this.uiContainerId = options.uiContainerId || 
       'ui-container';
     this.channelContainerId = options.channelContainerId || 
@@ -23,16 +23,19 @@ UIManager = (function() {
     this.eventId = 'uiman';
     this.defaultChannelCount = 4;
     this.rootContainer = $('#'+ this.rootContainerId);
+    
+    /** EventManager is a required component */
+    if(!options.em) {
+      throw 'Missing EventManager!'
+    }
     this.em = options.em;
     
-    this.initialize();
-
     /**
      * If not root is specified in constructor options, 
      * this fn explicitly adds the seq-root-elem into DOM.
      * @method  UIManager~createRootElement
      */
-    function createRootElement() {
+    this.createRootElement = function() {
 
       if(!document.getElementById('sequencer-root')) {
         var df = document.createElement('div');
@@ -43,13 +46,18 @@ UIManager = (function() {
         return 'sequencer-root';
       }
     }
+
+    /** Bootstrap the UIManager */
+    this.initialize();
   }
 
-  UIManager.instance = null;
+  UIManager._instance = null;
   
-  // TODO - just for test purposes.
+  /**
+   * Sets the private _instance property to null
+   */
   UIManager.destroy = function() {
-    this.instance = null;
+    this._instance = null;
   };
   
   /**
@@ -57,21 +65,12 @@ UIManager = (function() {
    * @return {Object}
    */
   UIManager.getInstance = function() {
-    return this.instance != null ? this.instance : this.instance = (
+    return this._instance != null ? this._instance : this._instance = (
       function(func, args, ctor) {
         ctor.prototype = func.prototype;
         var child = new ctor, result = func.apply(child, args);
         return Object(result) === result ? result : child;
       })(this, arguments, function(){});
-  };
-
-  /**
-   * Setter for the UIManager element list property.
-   * @method UIManager#setElementList
-   * @return {Object}
-   */
-  UIManager.prototype.setElementList = function(newList) {
-    this.elements = newList;
   };
 
   /**
@@ -127,29 +126,108 @@ UIManager = (function() {
    * @method UIManager#initialize 
    */
   UIManager.prototype.initialize = function() {
+
+    // TODO - create sequencer wrapper
+    // * core controls
+    // * initialize channels
+    // * register handlers
+    
+    // this.createControls(controlsWrapper?);
+
     this.uiContainer = $('<div id=' + this.uiContainerId + '></div>');
     this.uiContainer.appendTo(this.rootContainer);
     this.channelContainer = $('<div id=' + this.channelContainerId + '>');
 
     this.uiContainer.append(this.channelContainer);
     
+    /** from 15/6/2014 obsolete and will be replaced */
     var elemList = this.getElementList();
     this.drawElements(elemList);
     this.drawChannels();
-
-
     this.drawInputs();
+
     /** UIManager API for other components  - depends on EventManager */
-    try {this.em.register({
+    this.registerHandlers({
           'uiman:blinkOnTick' : this.blinkOnTick,
           'looper:tick' : this.highlightItem,
           'uiman:stop' : this.removeHighlight,
           'uiman:clear' : this.removeArmed,
-        }, null, this);
-    } catch (e) {
-      console.error(e);
-    }
+    });
   };
+
+  /** 
+   * Add containers for controls and channels of the sequencer.
+   * @return {String}        a compiled Handlebars template
+   */
+  UIManager.prototype.createSeqWrapper = function() {
+    var blueprint = '</div id={{warrperId}} class={{wrapperClass}}>' + 
+    '<div class={{controlsClass}}></div>' + 
+    '<div class={{channelsClass}}></div>' +
+    '</div>';
+
+    var compiled = Handlebars.compile(blueprint);
+
+    blueprintParams = {
+      wrapperClass: 'wrapper',
+      warrperId: 'seq-ui',
+      controlsClass: 'seq-controls-wrapper',
+      channelsClass: 'seq-channels-wrapper'
+    }
+
+    return compiled(blueprintParams);
+  }
+
+  /**
+   * Append basic controls for sequencer, channels.
+   * @return {[type]} [description]
+   */
+  UIManager.prototype.createControls = function() {
+
+    // TODO - add measures input
+    var stdCtrlBlueprint = '<div class={{mainCtrClass}}></div>' + 
+      '<div class={{loopCtrClass}}>' + 
+      '<span class={{loopPlayClass}}>play</span>' +
+      '<span class={{loopPauseClass}}>pause</span>' + 
+      '<span class={{loopStopClass}}>stop</span></div>' + 
+      '<div class={{tempoCtrClass}}></div>' + 
+      '<div class={{patternCtrClass}}>' + 
+      '<span class={{clearPatternClass}}>clear</span>' +
+      '<span class={{importPatternClass}}>import</span>' +
+      '<span class={{exportPatternClass}}>export</span>' +
+      '</div>';
+
+    var patternCtrlBlueprint  = '<div class={{channelCtrlClass}}>' + 
+      '</div>';
+
+    var stdCtrlBlueprintParams = {
+      mainCtrClass: 'main-controls',
+      loopCtrClass: 'loop-controls',
+      loopPlayClass: 'loop-play',
+      loopPauseClass: 'loop-pause',
+      loopStopClass: 'loop-stop',
+      tempoCtrClass: 'tempo-controls',
+      patternCtrClass: 'pattern-controls',
+      clearPatternClass: 'pattern-clear',
+      importPatternClass: 'pattern-import',
+      exportPatternClass: 'pattern-export'
+    };
+
+    var patternCtrlBlueprintParams = {
+      channelCtrlClass: 'channel-controls',
+    }
+    
+    var compiled = Handlebars.compile(stdCtrlBlueprint);
+
+    return compiled(blueprintParams)
+  };
+
+  UIManager.prototype.registerHandlers = function(eventsHash) {
+    try {
+      this.em.register(eventsHash, null, this);
+    } catch(err) {
+      console.error(err)
+    }
+  }
 
   /**
    * @method UIManager#drawElement - jqueryize elements

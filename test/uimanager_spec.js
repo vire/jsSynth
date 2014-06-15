@@ -18,6 +18,7 @@ function appendTestContainer() {
     'style="height: 200px;background: white;border: 1px solid black;">'+
     '</div>');
 }
+
 appendTestContainer();
 /**
  * Sometimes it's better to just mock the EventManager
@@ -27,21 +28,6 @@ appendTestContainer();
   'register': function() {},
   'emit' : function() {}
 }
-
-function populateHowler() {
-   window.soundFn = new Howl({
-     urls:['media/sounds.mp3'],
-     sprite: {
-       blast: [0,2000],
-       laser: [3000, 700],
-       speech: [5000, 500],
-       junk: [7000, 1000]
-     }
-   });
-   window.SoundArray = ['blast', 'laser', 'speech', 'junk'];
-}
-
-populateHowler();
 
 eventManager = EventManager.getInstance();
 
@@ -239,7 +225,7 @@ describe('.drawElements() method', function() {
 
     it('should by default create 4 channels', function() {
       $('#sequencer-test-container').empty();
-      UIManager.instance = null;
+      UIManager.destroy();
       uimanager = UIManager.getInstance(opts);
       expect(uimanager.channelContainer.children().length).not.toEqual(0)
     });
