@@ -14,15 +14,14 @@ UIManager = (function() {
    */
   function UIManager(options) {
     options = options || {};
-    this.rootContainerId = options.rootContainerId ||
-      this.createRootElement();
+    
     this.uiContainerId = options.uiContainerId || 
       'ui-container';
     this.channelContainerId = options.channelContainerId || 
       'seq-channel-container';
     this.eventId = 'uiman';
     this.defaultChannelCount = 4;
-    this.rootContainer = $('#'+ this.rootContainerId);
+    
     
     /** EventManager is a required component */
     if(!options.em) {
@@ -33,10 +32,9 @@ UIManager = (function() {
     /**
      * If not root is specified in constructor options, 
      * this fn explicitly adds the seq-root-elem into DOM.
-     * @method  UIManager~createRootElement
+     * @method  UIManager#createRootElement
      */
     this.createRootElement = function() {
-
       if(!document.getElementById('sequencer-root')) {
         var df = document.createElement('div');
         df.id = 'sequencer-root';
@@ -46,7 +44,10 @@ UIManager = (function() {
         return 'sequencer-root';
       }
     }
+    this.rootContainerId = options.rootContainerId ||
 
+      this.createRootElement();
+      this.rootContainer = $('#'+ this.rootContainerId);
     /** Bootstrap the UIManager */
     this.initialize();
   }
@@ -132,7 +133,9 @@ UIManager = (function() {
     // * initialize channels
     // * register handlers
     
-    // this.createControls(controlsWrapper?);
+    /** create the base wrappers for sequencer, controls and channels */
+    this.rootContainer.append(this.createSeqWrapper);
+    $('.seq-controls').append(this.createGeneralControls());
 
     this.uiContainer = $('<div id=' + this.uiContainerId + '></div>');
     this.uiContainer.appendTo(this.rootContainer);
@@ -157,69 +160,83 @@ UIManager = (function() {
 
   /** 
    * Add containers for controls and channels of the sequencer.
+   * @method UIManager#createSeqWrapper
    * @return {String}        a compiled Handlebars template
    */
   UIManager.prototype.createSeqWrapper = function() {
-    var blueprint = '</div id={{warrperId}} class={{wrapperClass}}>' + 
+    var blueprint = '<div id={{warrperId}} class={{wrapperClass}}>' + 
     '<div class={{controlsClass}}></div>' + 
     '<div class={{channelsClass}}></div>' +
     '</div>';
 
     var compiled = Handlebars.compile(blueprint);
 
-    blueprintParams = {
+    var blueprintParams = {
       wrapperClass: 'wrapper',
       warrperId: 'seq-ui',
-      controlsClass: 'seq-controls-wrapper',
-      channelsClass: 'seq-channels-wrapper'
+      controlsClass: 'seq-controls',
+      channelsClass: 'seq-channels'
     }
 
     return compiled(blueprintParams);
   }
 
   /**
-   * Append basic controls for sequencer, channels.
-   * @return {[type]} [description]
+   * Append basic control elements - loops, tempo, patterns.
+   * This creates only controls for the sequencer not for the channels.
+   * @method  UIManager#createGeneralControls
+   * @return {String} compiled and interpolated tempalte
    */
-  UIManager.prototype.createControls = function() {
+  UIManager.prototype.createGeneralControls = function() {
 
     // TODO - add measures input
-    var stdCtrlBlueprint = '<div class={{mainCtrClass}}></div>' + 
+    var blueprint = '<div class={{mainCtrClass}}>' + 
+      '<span class={{addChannelClass}}>add</span>' + 
+      '<label for=\'measures\' >measures:</label>' + 
+      '<input type=\'text\' name=\'measures\' class={{measuresClass}}>' + 
+      '</div>' + 
       '<div class={{loopCtrClass}}>' + 
       '<span class={{loopPlayClass}}>play</span>' +
       '<span class={{loopPauseClass}}>pause</span>' + 
       '<span class={{loopStopClass}}>stop</span></div>' + 
-      '<div class={{tempoCtrClass}}></div>' + 
-      '<div class={{patternCtrClass}}>' + 
+      '<div class={{tempoCtrClass}}><label for=\'signature\'>signature:' + 
+      '</label><input type=\'text\' name=\'measures\' ' + 
+      'class={{signatureBeatsClass}}>/<input type=\'text\' name=\'measures\' '+ 
+      'class={{signatureNotesClass}}><label for=\'bpm-input\'>BPM: </label>' + 
+      '<input type=\'text\' name=\'bpm-input\' class={{bpmClass}}> ' + 
+      '<span class={{bpmUpClass}}>+</span><span class={{bpmDownClass}}>-' + 
+      '</span></div><div class={{patternCtrClass}}>' + 
       '<span class={{clearPatternClass}}>clear</span>' +
       '<span class={{importPatternClass}}>import</span>' +
       '<span class={{exportPatternClass}}>export</span>' +
       '</div>';
 
-    var patternCtrlBlueprint  = '<div class={{channelCtrlClass}}>' + 
-      '</div>';
-
-    var stdCtrlBlueprintParams = {
+    var blueprintParams = {
       mainCtrClass: 'main-controls',
+      addChannelClass: 'main-add-channel',
+      measuresClass: 'main-measures-input',
+      signatureBeatsClass: 'tempo-beats-input',
+      signatureNotesClass: 'tempo-notes-input',
       loopCtrClass: 'loop-controls',
       loopPlayClass: 'loop-play',
       loopPauseClass: 'loop-pause',
       loopStopClass: 'loop-stop',
       tempoCtrClass: 'tempo-controls',
+      bpmInputClass: 'tempo-bpm-input',
       patternCtrClass: 'pattern-controls',
       clearPatternClass: 'pattern-clear',
       importPatternClass: 'pattern-import',
       exportPatternClass: 'pattern-export'
     };
 
-    var patternCtrlBlueprintParams = {
-      channelCtrlClass: 'channel-controls',
-    }
-    
-    var compiled = Handlebars.compile(stdCtrlBlueprint);
+    var compiled = Handlebars.compile(blueprint);
 
     return compiled(blueprintParams)
   };
+
+  UIManager.prototype.createChannelControls = function() {
+    throw 'Not Yet Implemented';
+  }
 
   UIManager.prototype.registerHandlers = function(eventsHash) {
     try {
@@ -409,6 +426,8 @@ UIManager = (function() {
     allItems.not(itemsToHighlight).removeClass('playing');
     itemsToHighlight.addClass('playing');
 
+    //blinkIndicator();
+    
     // TODO - logic for playing sounds
     // finds the elements to play via hasClass .armed
     // then find the appropriate channel id
@@ -421,6 +440,12 @@ UIManager = (function() {
         // console.log('Play tone array index: ',e.className.substr(12));
         // window.soundFn.play(window.SoundArray[e.className.substr(12)])
         // this.playSound(z);
+        var ind = $($('.indicator').get($(this).index()));
+        $(ind).addClass('active')
+        setTimeout(function() {
+          ind.removeClass('active')
+        }, 50)
+
         synth.play(z * 50  + 100 );
         setTimeout(function() {
           synth.stop(z * 50  + 100 );

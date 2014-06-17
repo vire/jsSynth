@@ -7,7 +7,7 @@ var result = 0, uic, uimanager, elemList, looper, eventManager;
   var head = document.getElementsByTagName('head')[0]; 
   var link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href='css/test-main.css';
+  link.href='css/main.css';
   link.type = 'text/css';
   head.appendChild(link);
 
@@ -15,7 +15,7 @@ var result = 0, uic, uimanager, elemList, looper, eventManager;
 
 function appendTestContainer() {
   document.write('<div id="sequencer-test-container" ' +
-    'style="height: 200px;background: white;border: 1px solid black;">'+
+    'style="background: white;border: 1px solid black;">'+
     '</div>');
 }
 
@@ -41,7 +41,7 @@ var opts = {
 
 describe('UIManager', function() {
 
-  // runs before each test
+  // runs before each test Y68ro388V721z9J
   beforeEach(function() {
     result++;
     uimanager = UIManager.getInstance(opts);
@@ -231,7 +231,7 @@ describe('.drawElements() method', function() {
     });
 
     it('each channel consists of 2 parts - controls and patterns', function() {
-      var channels = $("div[class^='seq-channel']");
+      var channels = $("#ui-container div[class^='seq-channel']");
       channels.each(function(index, channel) {
         var children = $(channel).children();
         expect(children.length).toEqual(2)

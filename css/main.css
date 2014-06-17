@@ -110,10 +110,11 @@ div[class^='seq-channel'] {
   background: #FF6B6B;
   float: right;
   border-radius: 5px;
+  display: none
 }
 
 .channel-controls .indicator.active {
-  background: white;
+  display: block;
 }
 
 /*.channel-controls:nth-child(odd) {
@@ -189,4 +190,38 @@ height: 22px;*/
 
 .channel-pattern .pattern-segment:nth-child(4n) {
     border-right: 5px solid white;
+}
+
+#seq-ui {
+    box-sizing: border-box;
+    display: inline-block;
+    width: 852px;
+    border: 1px solid silver;
+    margin: 5px;
+    padding: 6px;
+}
+
+.seq-controls {
+    background: yellow;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.seq-controls div {
+    display: inline-block;
+}
+
+.seq-controls span {
+    -webkit-user-select: none;
+    cursor: default;
+    padding: 0.35em;
+    margin: 0 0.2em;
+    background: gray;
+    display: inline-block;
+    box-sizing: border-box;
+}
+
+.seq-controls input {
+    width: 1.5em;
+    margin: 0 0.5em;
 }
