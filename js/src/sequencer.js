@@ -5,6 +5,7 @@ var Sequencer;
 * @class Sequencer
 */
 Sequencer = (function() {
+  'use strict';
   Sequencer._instance = null;
 
   /**
@@ -36,7 +37,7 @@ Sequencer = (function() {
       this.uiManager = UiManagerClass.getInstance({
         em : this.eventManager
       });
-    }
+    };
 
     /**  autoinitialize! */
     this.main();
@@ -54,7 +55,7 @@ Sequencer = (function() {
         var child = new ctor, result = func.apply(child, args);
         return Object(result) === result ? result : child;
       })(this, arguments, function() {});
-  }
+  };
 
   return Sequencer;
 

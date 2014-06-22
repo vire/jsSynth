@@ -36,10 +36,10 @@ describe('Looper', function() {
     
     it('must be instantiated with default properties', function() {
       expect(looper.cursor).toEqual(-1);
-      expect(looper.innerLoops).toEqual(1);
-      expect(looper.loopLength).toEqual(16);
-      expect(looper.loopSectionLegnth).toEqual(4);
-      expect(looper.loopSections).toEqual(4);
+      expect(looper.measures).toEqual(1);
+      expect(looper.totalSequenceLength).toEqual(16);
+      expect(looper.signatureNoteLength).toEqual(4);
+      expect(looper.signatureBeatCount).toEqual(4);
       expect(looper.tickDuration).not.toEqual(0);
     });
 
