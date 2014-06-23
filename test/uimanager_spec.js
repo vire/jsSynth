@@ -27,8 +27,12 @@ var eventManagerMock = {
 
 /** Options passed to the .getIntanceMehtod */
 var opts = {
-  rootContainerId: 'sequencer-test-container',
-  em: eventManager
+  defaultMeasureCount: 10,
+  signatureBeatCount: 3,
+  signatureNoteLength: 8,
+  defaultChannelCount: 10,
+  defaultBpm: 176
+
 };
 
 describe('UIManager', function() {
@@ -45,14 +49,8 @@ describe('UIManager', function() {
   });
   it('must accept an options hash - representing defaults', function() {
     var uimanInstance;
-    uimanInstance = UIManager.getInstance({
-      defaultMeasureCount: 10,
-      signatureBeatCount: 3,
-      signatureNoteLength: 8,
-      defaultChannelCount: 10,
-      defaultBpm: 176
-    });
-    expect(uimanInstance.defaultMeasureCount).toEqual(10);
+    uimanInstance = UIManager.getInstance(opts);
+    expect(uimanInstance.measures).toEqual(10);
     expect(uimanInstance.signatureBeatCount).toEqual(3);
     expect(uimanInstance.signatureNoteLength).toEqual(8);
     expect(uimanInstance.defaultChannelCount).toEqual(10);

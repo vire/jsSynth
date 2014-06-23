@@ -1,4 +1,4 @@
-/*global UIManager:true, EventManager:true Handlebars, $, console, synth */
+/*global UIManager:true, EventManager:true, Handlebars, $, console, synth */
 
 /**
  * Responsible for drawing/rendering items from element list property into DOM
@@ -18,7 +18,7 @@ UIManager = (function() {
     /** EventManager is a required component */
     this.em = EventManager.getInstance();
 
-    this.defaultMeasureCount = opts.defaultMeasureCount || 1;
+    this.measures = opts.defaultMeasureCount || 1;
     this.signatureBeatCount = opts.signatureBeatCount || 4;
     this.signatureNoteLength = opts.signatureNoteLength || 4;
     this.defaultChannelCount = opts.defaultChannelCount || 4;
@@ -104,7 +104,7 @@ UIManager = (function() {
     $('.seq-controls').append(this.createGeneralControls());
 
     this.initGeneralControlsHandlers();
-    //this.createChannels();
+    this.createChannels();
     /** from 15/6/2014 obsolete and will be replaced */
     this.drawChannels(this.defaultChannelCount);
 
@@ -181,7 +181,7 @@ UIManager = (function() {
       mainCtrClass: 'main-controls',
       addChannelClass: 'main-add-channel',
       measuresClass: 'main-measures-input',
-      measureCount: self.defaultMeasureCount,
+      measureCount: self.measures,
       signatureBeatsClass: 'tempo-beats-input',
       signatureBeatCount: self.signatureBeatCount,
       signatureNotesClass: 'tempo-notes-input',
@@ -263,39 +263,137 @@ UIManager = (function() {
     });
   };
 
-  UIManager.prototype.createChannels = function() {
-    var defaultChannels = [
+  /**
+   * Takes an list of channel as param, converts them into DOM objects,
+   * wraps them into channel container and initialize channel handlers.
+   * @method UIManager#createChannels
+   * @param channels
+   * @returns {boolean}
+   */
+  UIManager.prototype.createChannels = function(channels) {
+    var Channel, self;
+
+    self = this;
+    /** TODO - not yet implemented! */
+    var defaultChannels = channels || [
       {
         channelId: 0,
         channelLabel: 'someLabel',
         channelAudioExit: function() {
         },
-        channelPatter: []
+        channelPattern: []
       },
       {
         channelId: 1,
         channelLabel: 'someLabel',
         channelAudioExit: function() {
         },
-        channelPatter: []
+        channelPattern: []
       },
       {
         channelId: 2,
         channelLabel: 'someLabel',
         channelAudioExit: function() {
         },
-        channelPatter: []
+        channelPattern: []
       },
       {
         channelId: 3,
         channelLabel: 'someLabel',
         channelAudioExit: function() {
         },
-        channelPatter: []
+        channelPattern: []
       }
     ];
 
+    Channel = (function() {
+      function Channel(opts) {
+        this.channelId = opts.channelId;
+        this.channelLabel = opts.channelLabel;
+        this.measures = opts.measures;
+        this.beats = opts.beats;
+        this.noteLen = opts.noteLength;
+        this.initialize();
+      }
 
+      Channel.prototype.initialize = function() {
+        var channelClass, mainTemplate, params, self;
+        self = this;
+        channelClass =  'seq-channel-' + self.channelId;
+        mainTemplate = '<div class=\'' + channelClass + '\'>';
+        self.mainTemplate = mainTemplate + self.createChannelControls() +
+          self.createChannelContent(self.measures, self.beats, self.noteLen) +
+          '</div>';
+      };
+
+      Channel.prototype.createChannelControls = function() {
+        var buttons, volumeCtrl, freqCtrl;
+        var template, params;
+
+        template = '<div class={{chControlsClass}}>';
+        volumeCtrl = '<div class={{volClass}}></div>';
+        freqCtrl = '<div class={{freqClass}}></div>';
+        buttons = '<div class={{buttonsClass}}><span class={{swapClass}}>swap' +
+          '</span><span class={{removeClass}}>remove</span>' +
+          '<span class={{previewClass}}>preview</span>' +
+          '<span class={{muteClass}}>mute</span><span class={{soloClass}}>' +
+          'solo</span></div>';
+
+        template = template + volumeCtrl + freqCtrl + buttons + '</div>>';
+        params = {
+          chControlsClass: 'seq-channel-controls',
+          volClass: 'volume-controls',
+          buttonsClass: 'ch-controls-buttons',
+          swapClass: 'ch-controls-swap',
+          removeClass: 'ch-controls-remove',
+          muteClass: 'ch-controls-mute',
+          soloClass: 'ch-controls-mute'
+        };
+
+        return Handlebars.compile(template)(params);
+      };
+
+      Channel.prototype.createChannelContent =
+        function(measures, beats, noteLength) {
+          var template, params;
+
+          params = {
+            measureClass: 'seq-ch-measure',
+            beatsClass: 'seq-ch-beat',
+            noteClass: 'seq-ch-note'
+          };
+
+          template = '';
+          var i, j, k;
+          for(i = 0; i < measures; i++ ) {
+            template += '<div class={{measureClass}}>';
+            for(j = 0; j < beats; j++) {
+              template += '<div class{{beatsClass}}>';
+              for(k = 0; k < noteLength; k++) {
+                template += '<div class={{noteClass}}></div>';
+              }
+              template += '</div>';
+            }
+            template += '</div>';
+          }
+          return Handlebars.compile(template)(params);
+        };
+
+      Channel.prototype.toString = function() {
+        return this.mainTemplate;
+
+      };
+
+      return Channel;
+    })();
+    var channelParams = {
+      channelId: 0,
+      channelLabel: 'custom',
+      measures: self.measures,
+      beats: self.signatureBeatCount,
+      noteLength: self.signatureNoteLength
+    };
+    console.log('ss',new Channel(channelParams).toString());
     return true;
   };
 

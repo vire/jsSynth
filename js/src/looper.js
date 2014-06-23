@@ -36,7 +36,7 @@ Looper = (function() {
      * InnerLoops prop defines how many measures are created by default
      * TODO: addMeasure || updateMeasures method needs to be implemented!
      */
-    this.measures = options.defaultMeasureCount || 1;
+    this.measures = options.measures || 1;
 
     /**
      * beat per loop/bar/measure {signatureBeatCount}/x
