@@ -103,9 +103,9 @@ UIManager = (function() {
     $('.seq-controls').append(this.createGeneralControls());
 
     this.initGeneralControlsHandlers();
+
     this.createChannels();
-    /** from 15/6/2014 obsolete and will be replaced */
-    this.drawChannels(this.defaultChannelCount);
+    this.initChannels();
 
     /** UIManager API for other components  - depends on EventManager */
     this.registerHandlers({
@@ -416,6 +416,17 @@ UIManager = (function() {
     return true;
   };
 
+
+  /**
+   * Initialize === add event listeners && handlers.
+   * @method UIManager#initChannels
+   */
+  UIManager.prototype.initChannels = function() {
+    $('.ch-note').click(function() {
+      $(this).toggleClass('armed');
+    });
+  };
+
   /**
    * Pass this (UIManager) methods to the EventManager instance,
    * to enable interaction with other components and local binding as well.
@@ -436,8 +447,7 @@ UIManager = (function() {
    * @method  UIManager#removeArmed
    */
   UIManager.prototype.removeArmed = function() {
-
-    return $('.seq-channels').find('.armed').removeClass('armed');
+    return $('.ch-measure').find('.armed').removeClass('armed');
   };
 
   /**
@@ -446,91 +456,12 @@ UIManager = (function() {
    * @method UIManager#blinkOnTick
    */
   UIManager.prototype.blinkOnTick = function() {
-    (function toggle() {
-      $('.indicator').addClass('active');
+    (function toggleClass() {
+      $('.ch-indicator').addClass('active');
       setTimeout(function() {
-        $('.indicator').removeClass('active');
-      }, 200);
+        $('.ch-indicator').removeClass('active');
+      }, 50);
     })();
-  };
-
-  /**
-   * Adds the given number of segments to the channel.
-   * @method UIManager#addSegments
-   * @param {number} num - beats per loop
-   */
-  UIManager.prototype.addSegments = function(num) {
-    /**
-     * TODO - (24/6/2014) - obsolete
-     */
-    var j;
-    num = num || 4;
-
-    for (j = 0; j < num; j += 1) {
-      $('.channel-pattern').append($('<div class=\'pattern-segment\'>'));
-    }
-  };
-
-  /**
-   * Adds the given number of tick/items to each segment of all channels.
-   * @method UIManager#addSegments
-   * @param {number} num - notes per beat
-   * @param {string} className - name of the class to be added
-   */
-  UIManager.prototype.addSegmentItems = function(num, className) {
-    var k,
-      parentElem = 'pattern-segment';
-    className = className || 'segment-item';
-    num = num || 4;
-    for (k = 0; k < num; k += 1) {
-      $('.' + parentElem).append(createSegmentElement(className));
-    }
-
-    /**
-     * jQuery utility function to prevent function calling inside a for loop.
-     * @function UIManager~createSegmentElement
-     * @param  {string} className [description]
-     * @return {Object}           jQuery object
-     */
-    function createSegmentElement(className) {
-      return $('<div class=' + className + '>').click(function() {
-        $(this).toggleClass('armed');
-      });
-    }
-  };
-
-  /**
-   * Just puts the number of channels to the channel container.
-   * @method UIManager#drawChannels
-   * @param  {number} chCnt - number off channels per container
-   */
-  UIManager.prototype.drawChannels = function(chCnt) {
-
-    var compileSigStr, stringTmpl, i, obj;
-    var channelLabels = ['blast', 'laser', 'speech', 'junk'];
-    stringTmpl = '<div class=\'seq-channel-{{idx}}\'>' +
-      '<div class={{controlsClass}}><span class={{labelClass}}>' +
-      '{{labelText}}</span><div class={{indicatorClass}}></div></div>' +
-      '<div class={{patternClass}}></div></div>';
-
-    compileSigStr = Handlebars.compile(stringTmpl);
-
-    obj = {
-      controlsClass: 'channel-controls',
-      indicatorClass: 'indicator',
-      patternClass: 'channel-pattern',
-      labelClass: 'channel-label'
-
-    };
-
-    for (i = 0; i < chCnt; i += 1) {
-      obj.idx = i;
-      obj.labelText = channelLabels[i];
-//      this.channelContainer.append(compileSigStr(obj));
-      $('.seq-channels').append(compileSigStr(obj));
-    }
-    this.addSegments();
-    this.addSegmentItems();
   };
 
   /**
@@ -539,30 +470,27 @@ UIManager = (function() {
    * @param  {number} index - cursor in looper
    */
   UIManager.prototype.highlightItem = function(index) {
+    var tracksToPlay;
+    var self = this;
+    var indicator;
+    var tracks = $('.ch-measure');
+    var allNotes = tracks.find('.ch-note');
 
-    var chPatterns = $('.channel-pattern');
-    var allItems = chPatterns.find('.segment-item');
-    var itemsToHighlight = chPatterns.find('.segment-item:eq(' + index + ')');
+    var selectedNotes = tracks.find('.ch-note:eq(' + index + ')');
+    allNotes.not(selectedNotes).removeClass('playing');
 
-    allItems.not(itemsToHighlight).removeClass('playing');
-    itemsToHighlight.addClass('playing');
+    selectedNotes.addClass('playing');
+    if(selectedNotes.hasClass('armed')) {
 
-    // TODO - logic for playing sounds
-    // finds the elements to play via hasClass .armed
-    // then find the appropriate channel id
-    // trigger sound event on corresponding sound array
-    if (itemsToHighlight.hasClass('armed')) {
-      var channelsToPlay = itemsToHighlight.filter($('.armed'))
+      tracksToPlay = selectedNotes.filter($('.armed'))
         .parent().parent().parent();
 
-      channelsToPlay.each(function(z, e) {
-        // console.log('Play tone array index: ',e.className.substr(12));
-        // window.soundFn.play(window.SoundArray[e.className.substr(12)])
-        // this.playSound(z);
-        var ind = $($('.indicator').get($(this).index()));
-        $(ind).addClass('active');
+      tracksToPlay.each(function(z, e) {
+        indicator = e.children[0].children[3];
+        indicator.classList.add('active');
+
         setTimeout(function() {
-          ind.removeClass('active');
+          indicator.classList.remove('active');
         }, 50);
 
         synth.play(z * 50 + 100);
@@ -573,12 +501,14 @@ UIManager = (function() {
     }
   };
 
+
+
   /**
    * Remove all items highlighted to be played.
    * @returns {*|jQuery}
    */
   UIManager.prototype.removeHighlight = function() {
-    return $('.segment-item').removeClass('playing');
+    return $('.ch-note').removeClass('playing');
   };
 
   UIManager.prototype.updateBPM = function(bpmElem, newTempo) {

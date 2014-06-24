@@ -68,142 +68,14 @@ input[type=number] {
     height: 50px;
 }
 
-/* 24-6-2014 sequencer styling */
-
 #sequencer-root {
     box-sizing: border-box;
     display: block;
 }
 
-#ui-container {
-    display: inline-block;
-    width: 852px;
-    border: 1px solid silver;
-    margin: 5px;
-    padding: 6px;
-}
-
 div[class^='seq-channel'] {
     display: inline-block;
     min-width: 100%;
-}
-
-.channel-controls {
-    height: 30px;
-    width: 20%;
-    display: inline-block;
-    /*background: #565656;*/
-    background: #eee;
-    overflow: hidden;
-}
-
-/* marker */
-.channel-label {
-    display: inline;
-    position: relative;
-    margin-left: 0.5em;
-    /*color: #FAFAFA;*/
-    color: #565656;
-    font-size: 1em;
-    top: 0.5em;
-}
-
-div[class^='seq-channel'] {
-    display: inline-block;
-    min-width: 100%;
-
-}
-
-.channel-controls .indicator {
-    height: 10px;
-    width: 10px;
-    margin: 9px 5px;
-    background: #FF6B6B;
-    float: right;
-    border-radius: 5px;
-    display: none
-}
-
-.channel-controls .indicator.active {
-    display: block;
-}
-
-/*.channel-controls:nth-child(odd) {
-  background: #C0FFF5;
-}
-.channel-controls:nth-child(even) {
-  background: #C0FFCF;
-  }*/
-
-.channel-pattern {
-    height: 30px;
-    display: inline-block;
-    /*  background: wheat;
-      width: 70%;
-      border-bottom: 1px solid;
-      float: left;*/
-}
-
-.pattern-segment {
-    float: left;
-    height: 30px;
-    display: inline-block;
-    border-left: 1px solid black;
-}
-
-.pattern-segment:nth-child(odd) {
-    background: black;
-}
-
-.pattern-segment:nth-child(even) {
-    background: #4B4B4B;
-}
-
-.segment-item {
-    box-sizing: border-box;
-    display: inline-block;
-    height: 100%;
-    width: 15px;
-}
-
-.segment-item.armed {
-    border: 3px solid #E4E49F;
-    /*  width: 9px;
-    height: 22px;*/
-}
-
-.segment-item:nth-child(odd) {
-    background: #C6C6C6;
-}
-
-.segment-item:nth-child(even) {
-    background: #8E8E8E;
-}
-
-.segment-item.armed:nth-child(odd) {
-    border: 3px solid #EE5F5F;
-}
-
-.segment-item.armed:nth-child(even) {
-    border: 3px solid #EE5F5F;
-}
-
-.segment-item.playing {
-    /*border: 2px solid red;*/
-    background: #D8FC68;
-}
-
-.seq-loopsection-input,
-.seq-loopsectionlength-input {
-    width: 20px;
-}
-
-.seq-bpm-input {
-    width: 30px;
-}
-
-.channel-pattern .pattern-segment:nth-child(4n) {
-    border-right: 5px solid white;
 }
 
 #seq-ui {
@@ -240,30 +112,23 @@ div[class^='seq-channel'] {
     margin: 0 0.5em;
 }
 
-/* 24-6-2014 new channels styling */
-
 div.ch-controls {
     box-sizing: border-box;
-
-    height: 30px;
-    width: 25%;
     display: inline-block;
-    /* background: #565656; */
+    height: 30px;
+    width: 30%;
     background: #eee;
     overflow: hidden;
 }
 
 span.ch-label {
     box-sizing: border-box;
-
     display: inline;
     position: relative;
     margin-left: 0.5em;
-    /* color: #FAFAFA; */
     color: #565656;
     font-size: 1em;
     top: 0.5em;
-
 }
 
 div.ch-measure {
@@ -293,15 +158,38 @@ div.ch-note:nth-child(even) {
     background: #8E8E8E;
 }
 
-div.ch-measure .ch-beat:nth-child(4n) {
-    border-right: 5px solid white;
+div.ch-note.playing {
+    background: #D8FC68;
 }
 
 div.ch-buttons {
     display: block;
     box-sizing: border-box;
 }
+
 div.ch-buttons span {
     padding: 0.2em;
     display: inline-block;
+}
+
+div.ch-controls .ch-indicator {
+    height: 10px;
+    width: 10px;
+    margin: 0 5px;
+    background: #FF6B6B;
+    float: right;
+    border-radius: 5px;
+    display: none;
+}
+
+div.ch-controls .ch-indicator.active {
+    display: block;
+}
+
+.ch-note.armed {
+    border: 3px solid #EE5F5F;
+}
+
+div.ch-measure .ch-beat:nth-child(4n) {
+    border-right: 5px solid white;
 }
