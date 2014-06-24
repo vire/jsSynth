@@ -92,10 +92,9 @@ UIManager = (function() {
   UIManager.prototype.initialize = function() {
 
     /**
-     * TODO - refactor channels
-     * TODO - introduce channel class, probably pattern class
+     * TODO - refactor channels (24/6/2014) move to separate class
+     * TODO - introduce pattern class
      * TODO - initialize channels
-     * TODO - register handlers
      */
 
     /** create the base wrappers for sequencer, controls and channels */
@@ -271,10 +270,15 @@ UIManager = (function() {
    * @returns {boolean}
    */
   UIManager.prototype.createChannels = function(channels) {
+    var loopProperties;
     var Channel, self;
 
     self = this;
-    /** TODO - not yet implemented! */
+    /**
+     * TODO (24/6/2014) not yet implemented!
+     * TODO - freq input can be replaced for piano key
+     * TODO - classing
+     */
     var defaultChannels = channels || [
       {
         channelId: 0,
@@ -307,12 +311,12 @@ UIManager = (function() {
     ];
 
     Channel = (function() {
-      function Channel(opts) {
+      function Channel(opts, loopProps) {
         this.channelId = opts.channelId;
         this.channelLabel = opts.channelLabel;
-        this.measures = opts.measures;
-        this.beats = opts.beats;
-        this.noteLen = opts.noteLength;
+        this.measures = loopProps.measures;
+        this.beats = loopProps.beats;
+        this.noteLen = loopProps.noteLength;
         this.initialize();
       }
 
@@ -327,27 +331,39 @@ UIManager = (function() {
       };
 
       Channel.prototype.createChannelControls = function() {
-        var buttons, volumeCtrl, freqCtrl;
+        var playIndicator;
+        var buttons, volumeCtrl, freqCtrl, self;
         var template, params;
 
-        template = '<div class={{chControlsClass}}>';
+        self = this;
+
+        template = '<div class={{chControlsClass}}>' +
+          '<span class={{chLabelClass}}>{{chLabelText}}</span>';
         volumeCtrl = '<div class={{volClass}}></div>';
         freqCtrl = '<div class={{freqClass}}></div>';
-        buttons = '<div class={{buttonsClass}}><span class={{swapClass}}>swap' +
-          '</span><span class={{removeClass}}>remove</span>' +
+        playIndicator = '<div class={{indicatorClass}}></div>';
+        buttons = '<div class={{buttonsClass}}>' +
+          '<span class={{swapClass}}>swap</span>' +
+          '<span class={{removeClass}}>remove</span>' +
           '<span class={{previewClass}}>preview</span>' +
           '<span class={{muteClass}}>mute</span><span class={{soloClass}}>' +
           'solo</span></div>';
 
-        template = template + volumeCtrl + freqCtrl + buttons + '</div>>';
+        template = template + volumeCtrl + freqCtrl + playIndicator + buttons +
+          '</div>';
         params = {
-          chControlsClass: 'seq-channel-controls',
+          chControlsClass: 'ch-controls',
+          chLabelClass: 'ch-label',
+          chLabelText: self.channelLabel,
           volClass: 'volume-controls',
-          buttonsClass: 'ch-controls-buttons',
-          swapClass: 'ch-controls-swap',
-          removeClass: 'ch-controls-remove',
-          muteClass: 'ch-controls-mute',
-          soloClass: 'ch-controls-mute'
+          freqClass: 'freq-controls',
+          indicatorClass: 'ch-indicator',
+          buttonsClass: 'ch-buttons',
+          swapClass: 'ch-btn-swap',
+          removeClass: 'ch-btn-remove',
+          previewClass: 'ch-btn-preview',
+          muteClass: 'ch-btn-mute',
+          soloClass: 'ch-btn-solo'
         };
 
         return Handlebars.compile(template)(params);
@@ -358,9 +374,9 @@ UIManager = (function() {
           var template, params;
 
           params = {
-            measureClass: 'seq-ch-measure',
-            beatsClass: 'seq-ch-beat',
-            noteClass: 'seq-ch-note'
+            measureClass: 'ch-measure',
+            beatsClass: 'ch-beat',
+            noteClass: 'ch-note'
           };
 
           template = '';
@@ -368,7 +384,7 @@ UIManager = (function() {
           for(i = 0; i < measures; i++ ) {
             template += '<div class={{measureClass}}>';
             for(j = 0; j < beats; j++) {
-              template += '<div class{{beatsClass}}>';
+              template += '<div class={{beatsClass}}>';
               for(k = 0; k < noteLength; k++) {
                 template += '<div class={{noteClass}}></div>';
               }
@@ -386,22 +402,18 @@ UIManager = (function() {
 
       return Channel;
     })();
-    var channelParams = {
-      channelId: 0,
-      channelLabel: 'custom',
+
+    loopProperties = {
       measures: self.measures,
       beats: self.signatureBeatCount,
       noteLength: self.signatureNoteLength
     };
-    console.log('ss',new Channel(channelParams).toString());
+    defaultChannels.forEach(function(chInfo) {
+      $('.seq-channels').append(new Channel(chInfo, loopProperties).toString());
+//      console.log(new Channel(chInfo, loopProperties).toString());
+    });
+//    console.log('ss', new Channel(channelParams, loopProperties).toString());
     return true;
-  };
-
-  /**
-   * // TODO - implemented per channel it's own controls
-   */
-  UIManager.prototype.createChannelControls = function() {
-    throw 'Not Yet Implemented';
   };
 
   /**
@@ -448,7 +460,9 @@ UIManager = (function() {
    * @param {number} num - beats per loop
    */
   UIManager.prototype.addSegments = function(num) {
-    // TODO - get default segments from LOOPER or constructor
+    /**
+     * TODO - (24/6/2014) - obsolete
+     */
     var j;
     num = num || 4;
 
