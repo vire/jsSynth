@@ -89,6 +89,7 @@ div[class^='seq-channel'] {
 
 .seq-controls {
     background: yellow;
+    margin-bottom: 0.5em;
     display: inline-block;
     box-sizing: border-box;
 }
@@ -108,8 +109,17 @@ div[class^='seq-channel'] {
 }
 
 .seq-controls input {
-    width: 1.5em;
+    width: 35px;
     margin: 0 0.5em;
+}
+
+.tempo-controls input {
+    width: 25px;
+    margin: 0 0.5em;
+}
+
+#bpm-input {
+    width: 40px
 }
 
 div.ch-controls {
@@ -121,6 +131,12 @@ div.ch-controls {
     overflow: hidden;
 }
 
+div.ch-buttons {
+    position: relative;
+    top: -1em;
+    left: 7em;
+}
+
 span.ch-label {
     box-sizing: border-box;
     display: inline;
@@ -128,7 +144,7 @@ span.ch-label {
     margin-left: 0.5em;
     color: #565656;
     font-size: 1em;
-    top: 0.5em;
+    top: 0.2em;
 }
 
 div.ch-measure {

@@ -94,7 +94,6 @@ UIManager = (function() {
     /**
      * TODO - refactor channels (24/6/2014) move to separate class
      * TODO - introduce pattern class
-     * TODO - initialize channels
      */
 
     /** create the base wrappers for sequencer, controls and channels */
@@ -260,6 +259,24 @@ UIManager = (function() {
     $('.tempo-bpm-down').click(function() {
       self.updateBPM(bpmInput, parseInt(bpmInput.val()) - 1);
     });
+
+    $('.main-measures-input').on('change', function() {
+      var newVal = $(this).val();
+      var channels = $('div[class^=seq-channel-]');
+      var measure;
+      console.log('measure change');
+      if(self.measures < newVal) {
+        channels.each(function(ch, i) {
+          measure = $(i).find('.ch-measure:last-child');
+          measure.clone().appendTo(measure.parent());
+        });
+      } else {
+        console.log('remove measures');
+      }
+
+      // todo - emit measure change to looper,
+      // todo - update self.measures after measure re-adjustment
+    });
   };
 
   /**
@@ -277,7 +294,6 @@ UIManager = (function() {
     /**
      * TODO (24/6/2014) not yet implemented!
      * TODO - freq input can be replaced for piano key
-     * TODO - classing
      */
     var defaultChannels = channels || [
       {
@@ -500,8 +516,6 @@ UIManager = (function() {
       });
     }
   };
-
-
 
   /**
    * Remove all items highlighted to be played.
