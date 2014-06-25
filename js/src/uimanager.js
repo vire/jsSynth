@@ -352,6 +352,7 @@ UIManager = (function() {
         var template, params;
 
         self = this;
+        // todo - fa-circle-o
 
         template = '<div class={{chControlsClass}}>' +
           '<span class={{chLabelClass}}>{{chLabelText}}</span>';
@@ -359,11 +360,11 @@ UIManager = (function() {
         freqCtrl = '<div class={{freqClass}}></div>';
         playIndicator = '<div class={{indicatorClass}}></div>';
         buttons = '<div class={{buttonsClass}}>' +
-          '<span class={{swapClass}}>swap</span>' +
-          '<span class={{removeClass}}>remove</span>' +
-          '<span class={{previewClass}}>preview</span>' +
-          '<span class={{muteClass}}>mute</span><span class={{soloClass}}>' +
-          'solo</span></div>';
+          '<span class={{swapClass}} title="sawp sample"></span>' +
+          '<span class={{removeClass}} title="remove"></span>' +
+          '<span class={{previewClass}} title="preview"></span>' +
+          '<span class={{muteClass}} title="mute"></span>' +
+          '<span class={{soloClass}} title="solo"></span></div>';
 
         template = template + volumeCtrl + freqCtrl + playIndicator + buttons +
           '</div>';

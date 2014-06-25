@@ -5,6 +5,7 @@
     <meta name="viewport" content="target-densitydpi=device-dpi, initial-scale=1.0, user-scalable=no" />
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <title>recrof's Subtractive playground</title>
     <script type="text/javascript" src="js/vendor/jquery.min.js"></script>
     <script type="text/javascript" src="js/vendor/qwerty-hancock.js"></script>
@@ -119,13 +120,59 @@ for(var i=0; i&lt;4096;) {
 </div>
 <small class="body">ideas? thoughts? <a href="mailto:forcer@vnet.sk">send me a mail</a></small>
 <script type='text/javascript'>
+    var seq;
+    var debugPanel;
+    var updateDebug;
+
     (function() {
-      try {
-        Sequencer.getInstance(EventManager, Looper, UIManager)
-    } catch(e) {
-        console.error('Error on initializing Sequencer: ', e);
+        var minimize, content, refresh;
+        debugPanel = document.createElement('div');
+        debugPanel.id = 'debug-panel';
+        document.body.insertBefore(debugPanel, document.body.children[0]);
+        content = document.createElement('div');
+        content.className = 'debug-content';
+        minimize = document.createElement('div');
+        minimize.innerText = 'minimize';
+        minimize.style.float = 'right';
+        minimize.style['margin-left'] = '5px';
+        minimize.style.cursor= 'default';
+        minimize.addEventListener('click', function() {
+            if (!debugPanel.classList.contains('minimized')) {
+                debugPanel.classList.add('minimized');
+            } else {
+                debugPanel.classList.remove('minimized');
+            }
+        });
+        refresh = document.createElement('div');
+        refresh.innerText = 'refresh';
+        refresh.style.float = 'right';
+        refresh.style['margin-left'] = '5px';
+        refresh.style.cursor = 'default';
+        refresh.addEventListener('click', function() {
+
+            updateDebug();
+        });
+        debugPanel.appendChild(minimize);
+        debugPanel.appendChild(refresh);
+        debugPanel.appendChild(content);
+    })();
+    (function() {
+        try {
+            seq = Sequencer.getInstance(EventManager, Looper, UIManager);
+        } catch (e) {
+            console.error('Error on initializing Sequencer: ', e);
+        }
+    })();
+    updateDebug = function() {
+        var stringz = '';
+        if('undefined' !== typeof seq) {
+            for (var i = 0, keys = Object.keys(seq.looper); i < keys.length; i++) {
+                stringz += keys[i] + ' : ' + seq.looper[keys[i]] + '\n';
+            }
+            debugPanel.childNodes[2].innerText = '';
+            debugPanel.childNodes[2].innerText = stringz;
+        }
     }
-})();
 </script>
 </body>
 </html>

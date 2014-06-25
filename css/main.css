@@ -144,7 +144,8 @@ span.ch-label {
     margin-left: 0.5em;
     color: #565656;
     font-size: 1em;
-    top: 0.2em;
+    top: 7px;
+    left: 25px;
 }
 
 div.ch-measure {
@@ -198,6 +199,48 @@ div.ch-controls .ch-indicator {
     display: none;
 }
 
+div.ch-buttons {
+    position: relative;
+}
+
+span[class^=ch-btn-]:before {
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    /*--adjust as necessary--*/
+    color: #000;
+    font-size: 18px;
+    padding-right: 0.5em;
+    position: absolute;
+    top: 5px;
+}
+
+.ch-btn-preview:before {
+    content: "\f025";
+    left: -85px;
+}
+
+.ch-btn-swap:before {
+    content: "\f001";
+    left: 50px;
+}
+
+.ch-btn-remove:before {
+    content: "\f00d";
+    left: 80px;
+}
+
+.ch-btn-solo:before {
+    content: "\f192";
+    left: 110px;
+}
+
+.ch-btn-mute:before {
+    content: "\f026";
+    left: 135px;
+}
+
 div.ch-controls .ch-indicator.active {
     display: block;
 }
@@ -208,4 +251,24 @@ div.ch-controls .ch-indicator.active {
 
 div.ch-measure .ch-beat:nth-child(4n) {
     border-right: 5px solid white;
+}
+
+#debug-panel {
+    width: 330px;
+    height: 215px;
+    position: absolute;
+    background: rgba(233, 233, 233, 0.87);
+    z-index: 100;
+    box-sizing: border-box;
+    border: 3px solid;
+    font-family: sans-serif;
+    padding: 1em 0 0 1em;
+    font-size: 12px;
+}
+#debug-panel.minimized {
+    height: 30px;
+}
+#debug-panel .debug-content {
+    overflow: hidden;
+    height: 100%;
 }
