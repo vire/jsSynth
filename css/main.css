@@ -96,14 +96,19 @@ div[class^='seq-channel'] {
 
 .seq-controls div {
     display: inline-block;
+
+}
+
+.tempo-controls {
+    left: 50px;
+    position: relative;
 }
 
 .seq-controls span {
     -webkit-user-select: none;
     cursor: default;
-    padding: 0.35em;
-    margin: 0 0.2em;
-    background: gray;
+    padding: 0.5em;
+    margin-left: 0.5em;
     display: inline-block;
     box-sizing: border-box;
 }
@@ -126,7 +131,7 @@ div.ch-controls {
     box-sizing: border-box;
     display: inline-block;
     height: 30px;
-    width: 30%;
+    width: 250px;
     background: #eee;
     overflow: hidden;
 }
@@ -190,9 +195,11 @@ div.ch-buttons span {
 }
 
 div.ch-controls .ch-indicator {
+    top: -4px;
+    position: relative;
+    left: -2px;
     height: 10px;
     width: 10px;
-    margin: 0 5px;
     background: #FF6B6B;
     float: right;
     border-radius: 5px;
@@ -201,6 +208,45 @@ div.ch-controls .ch-indicator {
 
 div.ch-buttons {
     position: relative;
+}
+
+.loop-controls span {
+    position: relative;
+}
+
+.main-controls span:before,
+.loop-controls span:before,
+.pattern-controls span:before {
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    /*--adjust as necessary--*/
+    color: #000;
+    font-size: 18px;
+    padding-right: 0.5em;
+    position: absolute;
+    top: 0;
+}
+
+.loop-play:before {
+    content: "\f04b";
+}
+
+.loop-pause:before {
+    content: "\f04c";
+    left: 20px
+}
+
+.loop-stop:before {
+    content: "\f04d";
+    left: 40px
+}
+
+.main-add-channel {
+    position: relative;
+    margin-right: 12px;
+    left: -4px;
 }
 
 span[class^=ch-btn-]:before {
@@ -214,6 +260,10 @@ span[class^=ch-btn-]:before {
     padding-right: 0.5em;
     position: absolute;
     top: 5px;
+}
+
+.main-add-channel:before {
+    content: "\f196";
 }
 
 .ch-btn-preview:before {
@@ -241,6 +291,18 @@ span[class^=ch-btn-]:before {
     left: 135px;
 }
 
+.pattern-clear:before {
+    content: "\f1b8";
+}
+
+.pattern-import:before {
+    content: "\f019";
+}
+
+.pattern-export:before {
+    content: "\f093";
+}
+
 div.ch-controls .ch-indicator.active {
     display: block;
 }
@@ -251,6 +313,21 @@ div.ch-controls .ch-indicator.active {
 
 div.ch-measure .ch-beat:nth-child(4n) {
     border-right: 5px solid white;
+}
+
+
+.pattern-controls {
+    position: relative;
+    left: 20px;
+}
+
+.pattern-controls span {
+    position: relative;
+}
+
+.loop-controls {
+    position: relative;
+    left: -10px;
 }
 
 #debug-panel {
@@ -265,9 +342,11 @@ div.ch-measure .ch-beat:nth-child(4n) {
     padding: 1em 0 0 1em;
     font-size: 12px;
 }
+
 #debug-panel.minimized {
     height: 30px;
 }
+
 #debug-panel .debug-content {
     overflow: hidden;
     height: 100%;

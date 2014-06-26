@@ -153,14 +153,14 @@ UIManager = (function() {
     self = this;
 
     blueprint = '<div class={{mainCtrClass}}>' +
-      '<span class={{addChannelClass}}>add</span>' +
+      '<span class={{addChannelClass}}></span>' +
       '<label for=\'measures\' >measures:</label>' +
       '<input type=\'text\' name=\'measures\' class={{measuresClass}} ' +
       'value={{measureCount}}></div>' +
       '<div class={{loopCtrClass}}>' +
-      '<span class={{loopPlayClass}}>play</span>' +
-      '<span class={{loopPauseClass}}>pause</span>' +
-      '<span class={{loopStopClass}}>stop</span></div>' +
+      '<span class={{loopPlayClass}}></span>' +
+      '<span class={{loopPauseClass}}></span>' +
+      '<span class={{loopStopClass}}></span></div>' +
       '<div class={{tempoCtrClass}}><label for=\'signature\'>signature:' +
       '</label><input type=\'text\' name=\'measures\' ' +
       'class={{signatureBeatsClass}} value={{signatureBeatCount}}>/' +
@@ -170,9 +170,9 @@ UIManager = (function() {
       'value={{bpmDefaultValue}}><span class={{bpmUpClass}}>+</span>' +
       '<span class={{bpmDownClass}}>-' +
       '</span></div><div class={{patternCtrClass}}>' +
-      '<span class={{clearPatternClass}}>clear</span>' +
-      '<span class={{importPatternClass}}>import</span>' +
-      '<span class={{exportPatternClass}}>export</span>' +
+      '<span class={{clearPatternClass}}></span>' +
+      '<span class={{importPatternClass}}></span>' +
+      '<span class={{exportPatternClass}}></span>' +
       '</div>';
 
     blueprintParams = {
@@ -261,17 +261,22 @@ UIManager = (function() {
     });
 
     $('.main-measures-input').on('change', function() {
-      var newVal = $(this).val();
-      var channels = $('div[class^=seq-channel-]');
-      var measure;
-      console.log('measure change');
+      var channels, newVal, measure;
+      newVal = $(this).val();
+      channels = $('div[class^=seq-channel-]');
+      if(newVal <=0) {
+        $(this).val(1);
+        return;
+      }
       if(self.measures < newVal) {
         channels.each(function(ch, i) {
           measure = $(i).find('.ch-measure:last-child');
           measure.clone().appendTo(measure.parent());
         });
       } else {
-        console.log('remove measures');
+        channels.each(function(ch, i) {
+          $(i).find('.ch-measure:last-child').remove();
+        });
       }
 
       // todo - emit measure change to looper,
@@ -490,7 +495,7 @@ UIManager = (function() {
     var tracksToPlay;
     var self = this;
     var indicator;
-    var tracks = $('.ch-measure');
+    var tracks = $('div[class^=seq-channel-]');
     var allNotes = tracks.find('.ch-note');
 
     var selectedNotes = tracks.find('.ch-note:eq(' + index + ')');
