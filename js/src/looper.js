@@ -1,4 +1,4 @@
-/*global Looper:true, console */
+/*global EventManager, Looper:true, console */
 
 /**
  * @class - responsible for iteration and sequence logic.
@@ -66,7 +66,8 @@ Looper = (function() {
         'uiman:play': this.start,
         'uiman:pause': this.pause,
         'uiman:stop': this.stop,
-        'uiman:tempochange': this.updateTickDuration
+        'uiman:tempochange': this.updateTickDuration,
+        'uiman:measurechange' : this.updateSequenceLength
       }, null, this);
     }
     catch (e) {
@@ -167,6 +168,13 @@ Looper = (function() {
   Looper.prototype.updateTickDuration = function(newBPM) {
     this.tickDuration = (60000 / newBPM) /
       (this.DEFAULT_NOTE_LENGHT / this.signatureNoteLength);
+  };
+
+  Looper.prototype.updateSequenceLength = function(newMeasureCount) {
+    var self = this;
+    self.measures = newMeasureCount;
+    self.totalSequenceLength = self.measures *
+      self.signatureBeatCount * self.signatureNoteLength;
   };
 
   return Looper;

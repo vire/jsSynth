@@ -152,15 +152,18 @@ UIManager = (function() {
 
     self = this;
 
-    blueprint = '<div class={{mainCtrClass}}>' +
-      '<span class={{addChannelClass}}></span>' +
-      '<label for=\'measures\' >measures:</label>' +
-      '<input type=\'text\' name=\'measures\' class={{measuresClass}} ' +
-      'value={{measureCount}}></div>' +
+    blueprint =
       '<div class={{loopCtrClass}}>' +
       '<span class={{loopPlayClass}}></span>' +
       '<span class={{loopPauseClass}}></span>' +
       '<span class={{loopStopClass}}></span></div>' +
+      '<div class={{mainCtrClass}}>' +
+      '<label for=\'measures\' >measures:</label>' +
+      '<input type=\'text\' name=\'measures\' class={{measuresClass}} ' +
+      'value={{measureCount}} readonly>' +
+        '<span class={{measureUpClass}}></span>' +
+        '<span class={{measureDownClass}}></span>' +
+        '</div>' +
       '<div class={{tempoCtrClass}}><label for=\'signature\'>signature:' +
       '</label><input type=\'text\' name=\'measures\' ' +
       'class={{signatureBeatsClass}} value={{signatureBeatCount}}>/' +
@@ -173,13 +176,15 @@ UIManager = (function() {
       '<span class={{clearPatternClass}}></span>' +
       '<span class={{importPatternClass}}></span>' +
       '<span class={{exportPatternClass}}></span>' +
+      '<span class={{addChannelClass}}></span>' +
       '</div>';
 
     blueprintParams = {
       mainCtrClass: 'main-controls',
-      addChannelClass: 'main-add-channel',
       measuresClass: 'main-measures-input',
       measureCount: self.measures,
+      measureUpClass: 'main-measures-up',
+      measureDownClass: 'main-measures-down',
       signatureBeatsClass: 'tempo-beats-input',
       signatureBeatCount: self.signatureBeatCount,
       signatureNotesClass: 'tempo-notes-input',
@@ -196,7 +201,8 @@ UIManager = (function() {
       patternCtrClass: 'pattern-controls',
       clearPatternClass: 'pattern-clear',
       importPatternClass: 'pattern-import',
-      exportPatternClass: 'pattern-export'
+      exportPatternClass: 'pattern-export',
+      addChannelClass: 'pattern-add-channel'
     };
 
     compiled = Handlebars.compile(blueprint);
@@ -260,14 +266,34 @@ UIManager = (function() {
       self.updateBPM(bpmInput, parseInt(bpmInput.val()) - 1);
     });
 
+    $('.main-measures-up').click(function() {
+      var measure = $('.main-measures-input');
+      measure.val(parseInt(measure.val(),10) + 1);
+      measure.trigger('change');
+    });
+
+    $('.main-measures-down').click(function() {
+      var measure = $('.main-measures-input');
+
+      var measureCnt = parseInt(measure.val(), 10);
+
+      if(measureCnt <= 1) {
+        measure.val(1);
+        return;
+      }
+      measure.val(parseInt(measure.val(), 10) - 1);
+      measure.trigger('change');
+    });
+
     $('.main-measures-input').on('change', function() {
       var channels, newVal, measure;
       newVal = $(this).val();
       channels = $('div[class^=seq-channel-]');
-      if(newVal <=0) {
+      if(newVal <= 0) {
         $(this).val(1);
         return;
       }
+
       if(self.measures < newVal) {
         channels.each(function(ch, i) {
           measure = $(i).find('.ch-measure:last-child');
@@ -278,7 +304,10 @@ UIManager = (function() {
           $(i).find('.ch-measure:last-child').remove();
         });
       }
-
+      self.measures = newVal;
+      self.initChannels();
+      self.em.emit('uiman:measurechange', newVal);
+      self.updateSeqWrapperWidth();
       // todo - emit measure change to looper,
       // todo - update self.measures after measure re-adjustment
     });
@@ -536,6 +565,15 @@ UIManager = (function() {
     newTempo = 'number' === typeof newTempo ? newTempo : self.defaultBpm;
     bpmElem.val(newTempo);
     self.em.emit('uiman:tempochange', newTempo);
+  };
+
+  UIManager.prototype.updateSeqWrapperWidth = function() {
+    var self;
+    self = this;
+    var newWidth = (self.measures * 250) + 250 + 20;
+    newWidth = newWidth <= 770 ? 770 : newWidth;
+    console.log('new width', newWidth)
+      $('#seq-ui').css('width', newWidth+ 'px');
   };
 
   return UIManager;

@@ -81,7 +81,7 @@ div[class^='seq-channel'] {
 #seq-ui {
     box-sizing: border-box;
     display: inline-block;
-    width: 852px;
+    width: 770px;
     border: 1px solid silver;
     margin: 5px;
     padding: 6px;
@@ -99,8 +99,14 @@ div[class^='seq-channel'] {
 
 }
 
+.main-controls {
+    position: relative;
+    left: 45px;
+}
+
+
 .tempo-controls {
-    left: 50px;
+    left: 70px;
     position: relative;
 }
 
@@ -114,8 +120,9 @@ div[class^='seq-channel'] {
 }
 
 .seq-controls input {
-    width: 35px;
+    width: 25px;
     margin: 0 0.5em;
+    text-align: center;
 }
 
 .tempo-controls input {
@@ -210,6 +217,7 @@ div.ch-buttons {
     position: relative;
 }
 
+.main-controls,
 .loop-controls span {
     position: relative;
 }
@@ -243,12 +251,35 @@ div.ch-buttons {
     left: 40px
 }
 
-.main-add-channel {
+.main-measures-up:before {
+    content: "\f0d8";
+}
+
+.main-measures-down:before {
+    content: "\f0d7";
+}
+
+.pattern-clear:before {
+    content: "\f1b8";
+}
+
+.pattern-import:before {
+    content: "\f019";
+}
+
+.pattern-export:before {
+    content: "\f093";
+}
+
+.pattern-add-channel {
     position: relative;
     margin-right: 12px;
     left: -4px;
 }
 
+.pattern-add-channel:before {
+    content: "\f196";
+}
 span[class^=ch-btn-]:before {
     font-family: FontAwesome;
     font-style: normal;
@@ -260,10 +291,6 @@ span[class^=ch-btn-]:before {
     padding-right: 0.5em;
     position: absolute;
     top: 5px;
-}
-
-.main-add-channel:before {
-    content: "\f196";
 }
 
 .ch-btn-preview:before {
@@ -291,18 +318,6 @@ span[class^=ch-btn-]:before {
     left: 135px;
 }
 
-.pattern-clear:before {
-    content: "\f1b8";
-}
-
-.pattern-import:before {
-    content: "\f019";
-}
-
-.pattern-export:before {
-    content: "\f093";
-}
-
 div.ch-controls .ch-indicator.active {
     display: block;
 }
@@ -327,7 +342,7 @@ div.ch-measure .ch-beat:nth-child(4n) {
 
 .loop-controls {
     position: relative;
-    left: -10px;
+    left: -3px;
 }
 
 #debug-panel {
