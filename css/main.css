@@ -100,6 +100,7 @@ div[class^='seq-channel'] {
 }
 
 .main-controls {
+    background: orange;
     position: relative;
     left: 45px;
 }
@@ -107,6 +108,7 @@ div[class^='seq-channel'] {
 
 .tempo-controls {
     left: 70px;
+    background: mediumaquamarine;
     position: relative;
 }
 
@@ -117,6 +119,7 @@ div[class^='seq-channel'] {
     margin-left: 0.5em;
     display: inline-block;
     box-sizing: border-box;
+    position: relative;
 }
 
 .seq-controls input {
@@ -131,7 +134,7 @@ div[class^='seq-channel'] {
 }
 
 #bpm-input {
-    width: 40px
+    width: 30px
 }
 
 div.ch-controls {
@@ -224,6 +227,7 @@ div.ch-buttons {
 
 .main-controls span:before,
 .loop-controls span:before,
+.tempo-controls span:before ,
 .pattern-controls span:before {
     font-family: FontAwesome;
     font-style: normal;
@@ -253,33 +257,49 @@ div.ch-buttons {
 
 .main-measures-up:before {
     content: "\f0d8";
+    left: -5px;
 }
 
 .main-measures-down:before {
     content: "\f0d7";
+    left: -10px;
 }
 
 .pattern-clear:before {
     content: "\f1b8";
+    left:10px;
 }
 
 .pattern-import:before {
     content: "\f019";
+    left: 20px;
 }
 
 .pattern-export:before {
     content: "\f093";
+    left: 30px;
+    top: -5px
 }
 
 .pattern-add-channel {
     position: relative;
-    margin-right: 12px;
-    left: -4px;
 }
 
 .pattern-add-channel:before {
     content: "\f196";
+    left: 40px;
 }
+
+.tempo-bpm-up:before {
+    content: "\f0d8";
+    left: -5px;
+}
+
+.tempo-bpm-down:before {
+    content: "\f0d7";
+    left: -10px;
+}
+
 span[class^=ch-btn-]:before {
     font-family: FontAwesome;
     font-style: normal;
@@ -332,8 +352,9 @@ div.ch-measure .ch-beat:nth-child(4n) {
 
 
 .pattern-controls {
+    background: lavender;
     position: relative;
-    left: 20px;
+    left: 100px;
 }
 
 .pattern-controls span {
@@ -341,6 +362,7 @@ div.ch-measure .ch-beat:nth-child(4n) {
 }
 
 .loop-controls {
+    background: green;
     position: relative;
     left: -3px;
 }

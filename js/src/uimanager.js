@@ -170,8 +170,8 @@ UIManager = (function() {
       '<input type=\'text\' name=\'measures\' class={{signatureNotesClass}} ' +
       'value={{signatureNoteLength}}><label for=\'bpm-input\'>BPM: </label>' +
       '<input type=\'text\' id=\'bpm-input\' class={{bpmInputClass}} ' +
-      'value={{bpmDefaultValue}}><span class={{bpmUpClass}}>+</span>' +
-      '<span class={{bpmDownClass}}>-' +
+      'value={{bpmDefaultValue}}><span class={{bpmUpClass}}></span>' +
+      '<span class={{bpmDownClass}}>' +
       '</span></div><div class={{patternCtrClass}}>' +
       '<span class={{clearPatternClass}}></span>' +
       '<span class={{importPatternClass}}></span>' +
@@ -308,8 +308,6 @@ UIManager = (function() {
       self.initChannels();
       self.em.emit('uiman:measurechange', newVal);
       self.updateSeqWrapperWidth();
-      // todo - emit measure change to looper,
-      // todo - update self.measures after measure re-adjustment
     });
   };
 
@@ -473,7 +471,10 @@ UIManager = (function() {
    * @method UIManager#initChannels
    */
   UIManager.prototype.initChannels = function() {
-    $('.ch-note').click(function() {
+	  var chNote;
+	  chNote = $('.ch-note');
+	  chNote.unbind('click');
+    chNote.click(function() {
       $(this).toggleClass('armed');
     });
   };
@@ -572,8 +573,7 @@ UIManager = (function() {
     self = this;
     var newWidth = (self.measures * 250) + 250 + 20;
     newWidth = newWidth <= 770 ? 770 : newWidth;
-    console.log('new width', newWidth)
-      $('#seq-ui').css('width', newWidth+ 'px');
+      $('#seq-ui').css('width', newWidth + 'px');
   };
 
   return UIManager;
