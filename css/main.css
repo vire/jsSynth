@@ -88,7 +88,6 @@ div[class^='seq-channel'] {
 }
 
 .seq-controls {
-    background: yellow;
     margin-bottom: 0.5em;
     display: inline-block;
     box-sizing: border-box;
@@ -100,15 +99,23 @@ div[class^='seq-channel'] {
 }
 
 .main-controls {
-    background: orange;
     position: relative;
-    left: 45px;
+    left: 75px;
 }
 
+.main-add-chanel {
+    width: 100px;
+    margin-left: 20px;
+}
+
+.main-add-chanel:before {
+    content: "\f0fe";
+    left: -10px;
+    top: 10px;
+}
 
 .tempo-controls {
     left: 70px;
-    background: mediumaquamarine;
     position: relative;
 }
 
@@ -142,8 +149,17 @@ div.ch-controls {
     display: inline-block;
     height: 30px;
     width: 250px;
-    background: #eee;
+    background: #FFB0B0;
     overflow: hidden;
+}
+
+div.ch-controls.assigned {
+    background-color: #B6FFB0;
+}
+
+div.ch-controls.assigned .ch-btn-swap:before {
+    content: "\f0e2";
+    left: 52px;
 }
 
 div.ch-buttons {
@@ -243,16 +259,24 @@ div.ch-buttons {
 
 .loop-play:before {
     content: "\f04b";
+    left: -1px;
 }
 
+.loop-pause {
+    left:5px
+}
 .loop-pause:before {
     content: "\f04c";
-    left: 20px
+    left: 0;
 }
 
+
+.loop-stop {
+    left: 14px;
+}
 .loop-stop:before {
     content: "\f04d";
-    left: 40px
+    left: -1px
 }
 
 .main-measures-up:before {
@@ -267,28 +291,20 @@ div.ch-buttons {
 
 .pattern-clear:before {
     content: "\f1b8";
-    left:10px;
+    left: -1px;
 }
 
 .pattern-import:before {
     content: "\f019";
-    left: 20px;
+    left: -2px;
 }
 
 .pattern-export:before {
     content: "\f093";
-    left: 30px;
+    left: -5px;
     top: -5px
 }
 
-.pattern-add-channel {
-    position: relative;
-}
-
-.pattern-add-channel:before {
-    content: "\f196";
-    left: 40px;
-}
 
 .tempo-bpm-up:before {
     content: "\f0d8";
@@ -352,19 +368,25 @@ div.ch-measure .ch-beat:nth-child(4n) {
 
 
 .pattern-controls {
-    background: lavender;
     position: relative;
-    left: 100px;
+    left: 70px;
 }
 
 .pattern-controls span {
     position: relative;
 }
 
+.pattern-controls .pattern-import {
+    left: 20px;
+}
+.pattern-controls .pattern-export {
+    left: 25px;
+    top: -1px;
+}
+
 .loop-controls {
-    background: green;
     position: relative;
-    left: -3px;
+    width: 75px;
 }
 
 #debug-panel {

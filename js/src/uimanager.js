@@ -157,8 +157,8 @@ UIManager = (function() {
       '<span class={{loopPlayClass}}></span>' +
       '<span class={{loopPauseClass}}></span>' +
       '<span class={{loopStopClass}}></span></div>' +
-      '<div class={{mainCtrClass}}>' +
-      '<label for=\'measures\' >measures:</label>' +
+      '<div class={{mainCtrClass}}><span class={{mainAddChClass}}>add channel' +
+        '</span><label for=\'measures\' >measures:</label>' +
       '<input type=\'text\' name=\'measures\' class={{measuresClass}} ' +
       'value={{measureCount}} readonly>' +
         '<span class={{measureUpClass}}></span>' +
@@ -176,13 +176,13 @@ UIManager = (function() {
       '<span class={{clearPatternClass}}></span>' +
       '<span class={{importPatternClass}}></span>' +
       '<span class={{exportPatternClass}}></span>' +
-      '<span class={{addChannelClass}}></span>' +
       '</div>';
 
     blueprintParams = {
       mainCtrClass: 'main-controls',
       measuresClass: 'main-measures-input',
       measureCount: self.measures,
+      mainAddChClass: 'main-add-chanel',
       measureUpClass: 'main-measures-up',
       measureDownClass: 'main-measures-down',
       signatureBeatsClass: 'tempo-beats-input',
@@ -202,7 +202,6 @@ UIManager = (function() {
       clearPatternClass: 'pattern-clear',
       importPatternClass: 'pattern-import',
       exportPatternClass: 'pattern-export',
-      addChannelClass: 'pattern-add-channel'
     };
 
     compiled = Handlebars.compile(blueprint);
@@ -471,11 +470,33 @@ UIManager = (function() {
    * @method UIManager#initChannels
    */
   UIManager.prototype.initChannels = function() {
-	  var chNote;
+	  var chNote, self;
+    self = this;
 	  chNote = $('.ch-note');
 	  chNote.unbind('click');
     chNote.click(function() {
       $(this).toggleClass('armed');
+    });
+
+    $('.ch-btn-swap').click(function() {
+      var chControls, keyToPlay;
+      chControls = $(this).parent().parent();
+      keyToPlay = prompt('enter a-z key to play');
+      if(!keyToPlay) {
+        return;
+      } else {
+        chControls.attr('data-key', keyToPlay);
+        chControls.addClass('assigned');
+      }
+    });
+
+    $('.ch-btn-preview').click(function() {
+      var chControls, keyToTrigger;
+      chControls = $(this).parent().parent();
+      keyToTrigger = chControls.attr('data-key');
+      if(keyToTrigger) {
+        self.triggerKey(keyToTrigger);
+      }
     });
   };
 
@@ -524,6 +545,7 @@ UIManager = (function() {
   UIManager.prototype.highlightItem = function(index) {
     var tracksToPlay;
     var self = this;
+    var keyToTrigger;
     var indicator;
     var tracks = $('div[class^=seq-channel-]');
     var allNotes = tracks.find('.ch-note');
@@ -538,17 +560,10 @@ UIManager = (function() {
         .parent().parent().parent();
 
       tracksToPlay.each(function(z, e) {
-        indicator = e.children[0].children[3];
-        indicator.classList.add('active');
+        self.tickIndicator(e.children[0].children[3]);
 
-        setTimeout(function() {
-          indicator.classList.remove('active');
-        }, 50);
-
-        synth.play(z * 50 + 100);
-        setTimeout(function() {
-          synth.stop(z * 50 + 100);
-        }, 200);
+        self.triggerKey(tracksToPlay.find('.ch-controls')
+          .attr('data-key'));
       });
     }
   };
@@ -561,6 +576,32 @@ UIManager = (function() {
     return $('.ch-note').removeClass('playing');
   };
 
+  UIManager.prototype.tickIndicator = function(indicator) {
+    indicator.classList.add('active');
+
+    setTimeout(function() {
+      indicator.classList.remove('active');
+    }, 50);
+  };
+
+  UIManager.prototype.triggerKey = function(keyToTrigger) {
+    if(!keyToTrigger) {
+      return;
+    }
+
+    keyToTrigger = keyToTrigger.toUpperCase().charCodeAt(0);
+
+    var e1 = $.Event('keydown');
+    e1.keyCode= keyToTrigger;
+    $(document).trigger(e1);
+
+    var e2 = $.Event('keyup');
+    e2.keyCode = keyToTrigger;
+    setTimeout(function() {
+      $(document).trigger(e2);
+    }, 150);
+
+  };
   UIManager.prototype.updateBPM = function(bpmElem, newTempo) {
     var self = this;
     newTempo = 'number' === typeof newTempo ? newTempo : self.defaultBpm;
