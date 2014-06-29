@@ -18,7 +18,7 @@ bootSequencer = function() {
 
 window.addEventListener('DOMContentLoaded', function() {
   "use strict";
-  displayDebugPanel = true;
+  displayDebugPanel = false;
   seq = bootSequencer();
   if (displayDebugPanel) {
     debugPanel.loadDebugPanel(seq);

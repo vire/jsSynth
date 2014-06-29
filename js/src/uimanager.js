@@ -480,13 +480,31 @@ UIManager = (function() {
 
     $('.ch-btn-swap').click(function() {
       var chControls, keyToPlay;
-      chControls = $(this).parent().parent();
-      keyToPlay = prompt('enter a-z key to play');
-      if(!keyToPlay) {
-        return;
-      } else {
-        chControls.attr('data-key', keyToPlay);
-        chControls.addClass('assigned');
+      var swapEl = $(this);
+      var hancockKeys;
+      chControls = swapEl.parent().parent();
+      swapEl.addClass('active');
+      if(window.HancockInstance) {
+
+        hancockKeys = $('#keyboard ul li');
+        hancockKeys.each(function() {
+          $(this).click(function(ev) {
+            keyToPlay = ev.target.id;
+            if(!keyToPlay) {
+              return;
+            } else {
+              console.log('keyToPlay',keyToPlay);
+              chControls.attr('data-key', keyToPlay);
+              chControls.addClass('assigned');
+              chControls.find('.ch-btn-preview').css('display','inline-block');
+            }
+            hancockKeys.each(function(){
+              $(this).unbind('click');
+              swapEl.removeClass('active');
+
+            });
+          });
+        });
       }
     });
 
@@ -495,7 +513,7 @@ UIManager = (function() {
       chControls = $(this).parent().parent();
       keyToTrigger = chControls.attr('data-key');
       if(keyToTrigger) {
-        self.triggerKey(keyToTrigger);
+        self.triggerNote(keyToTrigger);
       }
     });
   };
@@ -562,7 +580,7 @@ UIManager = (function() {
       tracksToPlay.each(function(z, e) {
         self.tickIndicator(e.children[0].children[3]);
 
-        self.triggerKey(tracksToPlay.find('.ch-controls')
+        self.triggerNote(tracksToPlay.find('.ch-controls')
           .attr('data-key'));
       });
     }
@@ -582,6 +600,24 @@ UIManager = (function() {
     setTimeout(function() {
       indicator.classList.remove('active');
     }, 50);
+  };
+
+
+  UIManager.prototype.triggerNote = function(note) {
+    if(!window.HancockInstance) {
+      return;
+    }
+    var frequency;
+
+    frequency = window.HancockInstance.getFreqI(note);
+    if(!frequency) {
+      return;
+    }
+
+    window.HancockInstance.keyDown(note, frequency);
+    setTimeout(function() {
+      window.HancockInstance.keyUp(note, frequency);
+    },200);
   };
 
   UIManager.prototype.triggerKey = function(keyToTrigger) {

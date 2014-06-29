@@ -150,7 +150,10 @@ div.ch-buttons {
     box-sizing: border-box;
 }
 
-div.ch-buttons span {
+.ch-btn-preview {
+    display: none;
+}
+div.ch-buttons span:not(.ch-btn-preview) {
     padding: 0.2em;
     display: inline-block;
 }
@@ -264,6 +267,9 @@ span[class^=ch-btn-]:before {
     top: 5px;
 }
 
+
+
+
 .ch-btn-preview:before {
     content: "\f025";
     left: -85px;
@@ -272,6 +278,12 @@ span[class^=ch-btn-]:before {
 .ch-btn-swap:before {
     content: "\f001";
     left: 50px;
+}
+
+.ch-btn-swap.active:before {
+    content: "\f001";
+    left: 50px;
+    color: #415095;
 }
 
 .ch-btn-remove:before {

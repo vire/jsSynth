@@ -62,6 +62,7 @@ $(function () {
             id: 'autoUI',
             parent: autoDiv,
         });
+    window.HancockInstance = keyboard;
 
     function animateCanvas() {
         var sampling_divider = 0.5,

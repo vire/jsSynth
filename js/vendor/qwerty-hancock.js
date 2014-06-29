@@ -109,6 +109,8 @@
             return 440 * Math.pow(2, (key_number - 49) / 12);
         };
 
+        qh.getFreqI = getFrequency;
+
         // Define scale.
         (function() {
             for (i = 0; i < 7; i++) {
@@ -174,7 +176,7 @@
             } else {
                 li.addEventListener('mousedown', mouseDown);
                 li.addEventListener('mouseup', mouseUp);
-                li.addEventListener('mouseover', mouseOver);
+//                li.addEventListener('mouseover', mouseOver);
                 li.addEventListener('mouseout', mouseOut);
             }
         };
