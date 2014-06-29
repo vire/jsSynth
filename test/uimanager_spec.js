@@ -8,7 +8,7 @@ var result = 0, uic, uimanager, elemList, looper, eventManager;
   var head = document.getElementsByTagName('head')[0];
   var link = document.createElement('link');
   link.rel = 'stylesheet';
-  link.href = 'css/main.css';
+  link.href = 'css/seq-style.css';
   link.type = 'text/css';
   head.appendChild(link);
 

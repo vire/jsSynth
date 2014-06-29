@@ -4,7 +4,7 @@
       <!--link rel="stylesheet" href="http://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"-->
     <meta name="viewport" content="target-densitydpi=device-dpi, initial-scale=1.0, user-scalable=no" />
     <meta charset="utf-8">
-    <link rel="stylesheet" type="text/css" href="css/main.css">
+    <link rel="stylesheet" type="text/css" href="css/seq-style.css">
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet" type="text/css">
     <title>recrof's Subtractive playground</title>
@@ -16,6 +16,7 @@
     <script type="text/javascript" src="js/auto.js"></script>
     <script type="text/javascript" src="js/objects.js"></script>
     <script type="text/javascript" src="js/src/synth.js"></script>
+    <script type="text/javascript" src="js/src/sequencerloader.js"></script>
     <!-- sequencer sources-->
 
     <script type="text/javascript" src="js/vendor/handlebars.min.js"></script>
@@ -23,6 +24,7 @@
     <script type="text/javascript" src="js/src/looper.js"></script>
     <script type="text/javascript" src="js/src/uimanager.js"></script>
     <script type="text/javascript" src="js/src/sequencer.js"></script>
+    <script type="text/javascript" src="js/src/debugpanel.js"></script>
 
     <script type="text/html" id="SynthControlsTemplate">
     <div class="panel" id="osc${id}_panel">
@@ -118,59 +120,7 @@
 </div>
 <small class="body">ideas? thoughts? <a href="mailto:forcer@vnet.sk">send me a mail</a></small>
 <script type='text/javascript'>
-    var seq;
-    var debugPanel;
-    var updateDebug;
 
-    (function() {
-        var minimize, content, refresh;
-        debugPanel = document.createElement('div');
-        debugPanel.id = 'debug-panel';
-        document.body.insertBefore(debugPanel, document.body.children[0]);
-        content = document.createElement('div');
-        content.className = 'debug-content';
-        minimize = document.createElement('div');
-        minimize.innerText = 'minimize';
-        minimize.style.float = 'right';
-        minimize.style['margin-left'] = '5px';
-        minimize.style.cursor= 'default';
-        minimize.addEventListener('click', function() {
-            if (!debugPanel.classList.contains('minimized')) {
-                debugPanel.classList.add('minimized');
-            } else {
-                debugPanel.classList.remove('minimized');
-            }
-        });
-        refresh = document.createElement('div');
-        refresh.innerText = 'refresh';
-        refresh.style.float = 'right';
-        refresh.style['margin-left'] = '5px';
-        refresh.style.cursor = 'default';
-        refresh.addEventListener('click', function() {
-
-            updateDebug();
-        });
-        debugPanel.appendChild(minimize);
-        debugPanel.appendChild(refresh);
-        debugPanel.appendChild(content);
-    })();
-    (function() {
-        try {
-            seq = Sequencer.getInstance(EventManager, Looper, UIManager);
-        } catch (e) {
-            console.error('Error on initializing Sequencer: ', e);
-        }
-    })();
-    updateDebug = function() {
-        var stringz = '';
-        if('undefined' !== typeof seq) {
-            for (var i = 0, keys = Object.keys(seq.looper); i < keys.length; i++) {
-                stringz += keys[i] + ' : ' + seq.looper[keys[i]] + '\n';
-            }
-            debugPanel.childNodes[2].innerText = '';
-            debugPanel.childNodes[2].innerText = stringz;
-        }
-    }
 </script>
 </body>
 </html>
