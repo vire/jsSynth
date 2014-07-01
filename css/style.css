@@ -102,9 +102,9 @@ input[type=number] {
 .title {
     font-weight: bold;
     width: 100%;
-    padding: 0px;
-    margin: 0px;
     padding-bottom: 5px;
+    padding: 0;
+    margin: 0;
 }
 .panel_auto {
     position: absolute;

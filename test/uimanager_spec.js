@@ -42,7 +42,6 @@ describe('UIManager', function() {
   it('must be callable via .getInstance()', function() {
     var uimanInstance;
     uimanInstance = null;
-    expect(UIManager._instance).toBe(null);
     uimanInstance = UIManager.getInstance();
     expect(uimanInstance).toBeDefined();
     UIManager.destroy();
