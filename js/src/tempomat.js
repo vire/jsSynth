@@ -1,4 +1,4 @@
-/*global webkitAudioContext, AudioContext, console */
+/*global EventManager, webkitAudioContext, AudioContext, console */
 
 /**
  * Custom impl of https://github.com/cwilso/ metronome.js
@@ -27,6 +27,7 @@ TempoMat = (function(g) {
    * @constructor
    */
   function TempoMat() {
+    this.em = EventManager.getInstance();
     this.loopLength = 1;
     this.intervalID = 0;
     this.notesInQueue = [];
@@ -36,8 +37,32 @@ TempoMat = (function(g) {
     this.scheduleAheadTime = 0.1;
     this.nextNoteTime = 0.0;
     this.noteLength = 0.05;
-    this.noteResolution = 0; // 0 == 16th, 1 == 8th, 2 == quarter, 3 half, 4 whole
+    this.noteResolution = 0;
+
+    try {
+      this.em.register({
+        'uiman:play': this.play,
+        'uiman:stop': this.stop,
+        'uiman:tempochange': this.changeTempo,
+        'uiman:measurechange' : this.changeLoopLength
+      }, null, this);
+    }
+    catch (e) {
+      console.error(e);
+    }
   }
+
+  TempoMat._instance = null;
+
+  TempoMat.getInstance = function() {
+    return this._instance !== null ? this._instance : this._instance =
+      (function(func, args, ctor) {
+        ctor.prototype = func.prototype;
+        var child = new ctor,
+        result = func.apply(child, args);
+        return Object(result) === result ? result : child;
+      })(this, arguments, function() {});
+  };
 
   TempoMat.prototype.computeNextNote = function() {
     var secondPerBeat = 60.0 / this.tempo;
@@ -75,7 +100,6 @@ TempoMat = (function(g) {
 
 //    console.log('beatNumber, time', beatNumber, time);
 
-
     source.start(time);
     source.stop(time + this.noteLength);
 
@@ -83,7 +107,7 @@ TempoMat = (function(g) {
   };
 
   TempoMat.prototype.schedule = function() {
-    console.log('while condition: ',this.nextNoteTime < context.currentTime + this.scheduleAheadTime);
+//    console.log('while condition: ',this.nextNoteTime < context.currentTime + this.scheduleAheadTime);
     while (this.nextNoteTime < context.currentTime + this.scheduleAheadTime) {
       this.scheduleNextNote(this.current16thNote, this.nextNoteTime);
       this.computeNextNote();
@@ -121,4 +145,4 @@ TempoMat = (function(g) {
 
 })(window);
 
-var tt = new TempoMat();
+var tt = TempoMat.getInstance();
