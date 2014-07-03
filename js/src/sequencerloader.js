@@ -1,4 +1,4 @@
-/*global console, debugPanel, Sequencer, EventManager, Looper, UIManager */
+/*global TempoMat, console, debugPanel, Sequencer, EventManager, UIManager */
 var bootSequencer, displayDebugPanel, seq;
 
 /**
@@ -9,7 +9,8 @@ bootSequencer = function() {
   "use strict";
   var sequencerInstance;
   try {
-    sequencerInstance = Sequencer.getInstance(EventManager, Looper, UIManager);
+    sequencerInstance =
+      Sequencer.getInstance(EventManager, TempoMat, UIManager);
   } catch (e) {
     console.error('Error during initializing the Sequencer: ', e);
   }

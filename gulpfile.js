@@ -6,18 +6,18 @@ var gulp = require('gulp'),
 var paths = {
 	scripts: [
 		'js/src/eventmanager.js',
-		'js/src/looper.js',
+		'js/src/tempo.js',
 		'js/src/tempomat.js',
 		'js/src/uimanager.js',
 		'js/src/sequencer.js',
 		'js/src/sequencerloader.js',
 		'js/src/debugpanel.js'
 		]
-}
+};
 
 gulp.task('clean', function(cb) {
   del(['dist'], cb);
-})
+});
 
 gulp.task('scripts', ['clean'], function() {
 	return gulp.src(paths.scripts)
@@ -25,5 +25,10 @@ gulp.task('scripts', ['clean'], function() {
 		.pipe(concat('seq.min.js'))
 		.pipe(gulp.dest('dist'));
 
-})
-gulp.task('default', ['scripts']);
+});
+
+gulp.task('watch', function() {
+  gulp.watch('js/src/*.js', ['scripts']);
+});
+
+gulp.task('default', ['scripts', 'watch']);

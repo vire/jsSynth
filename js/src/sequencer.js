@@ -11,15 +11,15 @@ Sequencer = (function() {
   /**
    * @constructor
    * @param {Function} EventManagerClass [description]
-   * @param {Function} LooperClass       [description]
+   * @param {Function} TempoMatClass       [description]
    * @param {Function} UiManagerClass    [description]
    * @param {Function} optionsHash       [description]
    */
-  function Sequencer(EventManagerClass, LooperClass, UiManagerClass, optionsHash) {
+  function Sequencer(EventManagerClass, TempoMat, UiManagerClass, optionsHash) {
     this.name = name || 'Sequencer';
 
     this.eventManager = null;
-    this.looper = null;
+    this.tempo = null;
     this.uiManager = null;
     
     /**
@@ -31,7 +31,7 @@ Sequencer = (function() {
       this.eventManager = EventManagerClass.getInstance();
 
       // those two require eventManager on instantiation time;
-      this.looper = LooperClass.getInstance({
+      this.tempo = TempoMat.getInstance({
         em : this.eventManager
       });
       this.uiManager = UiManagerClass.getInstance({

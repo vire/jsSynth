@@ -8,8 +8,8 @@ debugPanel = (function() {
   updateDebug = function() {
     var stringz = '';
     if ('undefined' !== typeof seq) {
-      for (var i = 0, keys = Object.keys(seq.looper); i < keys.length; i++) {
-        stringz += keys[i] + ' : ' + seq.looper[keys[i]] + '\n';
+      for (var i = 0, keys = Object.keys(seq.tempo); i < keys.length; i++) {
+        stringz += keys[i] + ' : ' + seq.tempo[keys[i]] + '\n';
       }
       debugPanel.childNodes[2].innerText = '';
       debugPanel.childNodes[2].innerText = stringz;

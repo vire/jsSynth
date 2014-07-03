@@ -109,7 +109,7 @@ UIManager = (function() {
     /** UIManager API for other components  - depends on EventManager */
     this.registerHandlers({
       'uiman:blinkOnTick': this.blinkOnTick,
-      'looper:tick': this.highlightItem,
+      'tempo:tick': this.highlightItem,
       'uiman:stop': this.removeHighlight,
       'uiman:clear': this.removeArmed
     });
@@ -556,9 +556,9 @@ UIManager = (function() {
   };
 
   /**
-   * On every tick from Looper, this fn adds a highlight to the respective
+   * On every tick from TempoMat, this fn adds a highlight to the respective
    * element(item) in the channel's pattern.
-   * @param  {number} index - cursor in looper
+   * @param  {number} index - cursor in tempo
    */
   UIManager.prototype.highlightItem = function(index) {
     var tracksToPlay;

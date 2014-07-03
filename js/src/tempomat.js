@@ -28,11 +28,11 @@ TempoMat = (function(g) {
    */
   function TempoMat() {
     this.em = EventManager.getInstance();
-    this.loopLength = 1;
+    this.measures = 1;
     this.intervalID = 0;
     this.notesInQueue = [];
     this.isPlaying = false;
-    this.tempo = 120.0;
+    this.tempo = 140.0;
     this.lookahead = 25.0;
     this.scheduleAheadTime = 0.1;
     this.nextNoteTime = 0.0;
@@ -43,8 +43,9 @@ TempoMat = (function(g) {
       this.em.register({
         'uiman:play': this.play,
         'uiman:stop': this.stop,
+        'uiman:pause': this.pause,
         'uiman:tempochange': this.changeTempo,
-        'uiman:measurechange' : this.changeLoopLength
+        'uiman:measurechange' : this.measureChange
       }, null, this);
     }
     catch (e) {
@@ -68,9 +69,8 @@ TempoMat = (function(g) {
     var secondPerBeat = 60.0 / this.tempo;
 
     this.nextNoteTime += 0.25 * secondPerBeat;
-//    console.log('this.nextNoteTime', this.nextNoteTime);
     this.current16thNote++;
-    if ((STD_NOTE_LENGTH * this.loopLength) === this.current16thNote) {
+    if ((STD_NOTE_LENGTH * this.measures) === this.current16thNote) {
       this.current16thNote = 0;
     }
   };
@@ -102,12 +102,11 @@ TempoMat = (function(g) {
 
     source.start(time);
     source.stop(time + this.noteLength);
-
+    this.em.emit('tempo:tick', beatNumber);
     // Here goes the play / stop command
   };
 
   TempoMat.prototype.schedule = function() {
-//    console.log('while condition: ',this.nextNoteTime < context.currentTime + this.scheduleAheadTime);
     while (this.nextNoteTime < context.currentTime + this.scheduleAheadTime) {
       this.scheduleNextNote(this.current16thNote, this.nextNoteTime);
       this.computeNextNote();
@@ -116,17 +115,31 @@ TempoMat = (function(g) {
   };
 
   TempoMat.prototype.play = function() {
-    this.isPlaying = !this.isPlaying;
-    if (this.isPlaying) {
+    if (!this.isPlaying) {
+      this.isPlaying = true;
       this.current16thNote = 0;
       this.nextNoteTime = context.currentTime;
       this.schedule();
+    } else {
+      this.stop();
+      this.play();
     }
   };
 
   TempoMat.prototype.stop = function() {
-    this.isPlaying = !this.isPlaying;
+    this.isPlaying = false;
     return g.clearTimeout(this.timerID);
+  };
+
+  TempoMat.prototype.pause = function() {
+    if(this.isPlaying) {
+      this.isPlaying = !this.isPlaying;
+      g.clearTimeout(this.timerID);
+    } else {
+      this.isPlaying = !this.isPlaying;
+      this.nextNoteTime = context.currentTime;
+      this.schedule();
+    }
   };
 
   TempoMat.prototype.changeNoteResolution = function(newResolution) {
@@ -137,8 +150,12 @@ TempoMat = (function(g) {
     this.tempo = newBPM;
   };
 
-  TempoMat.prototype.changeLoopLength = function(newLength) {
-    this.loopLength = newLength;
+  TempoMat.prototype.measureChange = function(newLength) {
+    if(this.current16thNote >= STD_NOTE_LENGTH * newLength) {
+      this.play();
+    }
+    this.measures = newLength;
+
   };
 
   return TempoMat;
