@@ -38,12 +38,12 @@ div[class^='seq-channel'] {
     left: 75px;
 }
 
-.main-add-chanel {
+.main-add-channel {
     width: 100px;
     margin-left: 20px;
 }
 
-.main-add-chanel:before {
+.main-add-channel:before {
     content: "\f0fe";
     left: -10px;
     top: 10px;

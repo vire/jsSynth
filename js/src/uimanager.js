@@ -21,7 +21,7 @@ UIManager = (function() {
     this.measures = opts.defaultMeasureCount || 1;
     this.signatureBeatCount = opts.signatureBeatCount || 4;
     this.signatureNoteLength = opts.signatureNoteLength || 4;
-    this.defaultChannelCount = opts.defaultChannelCount || 4;
+    this.defaultChannelCount = opts.defaultChannelCount || 1;
     this.defaultBpm = opts.defaultBpm || 140;
 
     this.eventPrefix = 'uiman';
@@ -92,8 +92,7 @@ UIManager = (function() {
   UIManager.prototype.initialize = function() {
 
     /**
-     * TODO - refactor channels (24/6/2014) move to separate class
-     * TODO - introduce pattern class
+     * TODO - refactor channels (5/7/2014) move to separate UI class
      */
 
     /** create the base wrappers for sequencer, controls and channels */
@@ -182,7 +181,7 @@ UIManager = (function() {
       mainCtrClass: 'main-controls',
       measuresClass: 'main-measures-input',
       measureCount: self.measures,
-      mainAddChClass: 'main-add-chanel',
+      mainAddChClass: 'main-add-channel',
       measureUpClass: 'main-measures-up',
       measureDownClass: 'main-measures-down',
       signatureBeatsClass: 'tempo-beats-input',
@@ -333,27 +332,6 @@ UIManager = (function() {
         channelAudioExit: function() {
         },
         channelPattern: []
-      },
-      {
-        channelId: 1,
-        channelLabel: 'someLabel',
-        channelAudioExit: function() {
-        },
-        channelPattern: []
-      },
-      {
-        channelId: 2,
-        channelLabel: 'someLabel',
-        channelAudioExit: function() {
-        },
-        channelPattern: []
-      },
-      {
-        channelId: 3,
-        channelLabel: 'someLabel',
-        channelAudioExit: function() {
-        },
-        channelPattern: []
       }
     ];
 
@@ -383,7 +361,6 @@ UIManager = (function() {
         var template, params;
 
         self = this;
-        // todo - fa-circle-o
 
         template = '<div class={{chControlsClass}}>' +
           '<span class={{chLabelClass}}>{{chLabelText}}</span>';

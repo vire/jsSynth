@@ -37,7 +37,7 @@ TempoMat = (function(g) {
     this.scheduleAheadTime = 0.1;
     this.nextNoteTime = 0.0;
     this.noteLength = 0.05;
-    this.noteResolution = 0;
+    this.noteResolution = 2;
 
     try {
       this.em.register({
@@ -81,7 +81,7 @@ TempoMat = (function(g) {
 //    source.connect(context.destination);
 //    source.frequency.value = 220.0;
 //    this.notesInQueue.push({note: beatNumber, time: time});
-
+    this.em.emit('tempo:tick', beatNumber);
     if ((1 === this.noteResolution) && (beatNumber % 2)) {
       return;
     }
@@ -97,12 +97,10 @@ TempoMat = (function(g) {
     if ((4 === this.noteResolution) && (beatNumber % 16)) {
       return;
     }
-
 //    console.log('beatNumber, time', beatNumber, time);
-
     source.start(time);
     source.stop(time + this.noteLength);
-    this.em.emit('tempo:tick', beatNumber);
+    this.em.emit('tempo:notetick', beatNumber);
     // Here goes the play / stop command
   };
 
@@ -155,7 +153,6 @@ TempoMat = (function(g) {
       this.play();
     }
     this.measures = newLength;
-
   };
 
   return TempoMat;

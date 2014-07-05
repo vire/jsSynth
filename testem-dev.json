@@ -7,6 +7,6 @@
     "./js/vendor/**.js",
     "./js/src/**.js",
     "./test/bind_polyfill.js",
-	"./test/uimanager_spec.js"
+	  "./test/channel-manager-spec.js"
   ]
 }

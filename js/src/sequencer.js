@@ -11,7 +11,7 @@ Sequencer = (function() {
   /**
    * @constructor
    * @param {Function} EventManagerClass [description]
-   * @param {Function} TempoMatClass       [description]
+   * @param {Function} TempoMat       [description]
    * @param {Function} UiManagerClass    [description]
    * @param {Function} optionsHash       [description]
    */

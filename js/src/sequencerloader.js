@@ -6,7 +6,7 @@ var bootSequencer, displayDebugPanel, seq;
  * @function
  */
 bootSequencer = function() {
-  "use strict";
+  'use strict';
   var sequencerInstance;
   try {
     sequencerInstance =
