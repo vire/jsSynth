@@ -2,6 +2,7 @@
   "framework": "jasmine2",
   "src_files": [
     "./js/**/**.js",
+    "./test/**/**.js",
     "./test/**.js"
   ],
   "launch_in_ci" : ["PhantomJS"]

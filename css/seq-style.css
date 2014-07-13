@@ -3,6 +3,21 @@
     height: 50px;
 }
 
+.overlay {
+    background: rgba(0, 0, 0, 0.3);
+    display: none;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99998;
+}
+
+#keyboard {
+    position: relative;
+}
+
 #sequencer-root {
     box-sizing: border-box;
     display: block;
@@ -153,6 +168,7 @@ div.ch-buttons {
 .ch-btn-preview {
     display: none;
 }
+
 div.ch-buttons span:not(.ch-btn-preview) {
     padding: 0.2em;
     display: inline-block;
@@ -181,7 +197,7 @@ div.ch-buttons {
 
 .main-controls span:before,
 .loop-controls span:before,
-.tempo-controls span:before ,
+.tempo-controls span:before,
 .pattern-controls span:before {
     font-family: FontAwesome;
     font-style: normal;
@@ -201,17 +217,18 @@ div.ch-buttons {
 }
 
 .loop-pause {
-    left:5px
+    left: 5px
 }
+
 .loop-pause:before {
     content: "\f04c";
     left: 0;
 }
 
-
 .loop-stop {
     left: 14px;
 }
+
 .loop-stop:before {
     content: "\f04d";
     left: -1px
@@ -243,7 +260,6 @@ div.ch-buttons {
     top: -5px
 }
 
-
 .tempo-bpm-up:before {
     content: "\f0d8";
     left: -5px;
@@ -266,9 +282,6 @@ span[class^=ch-btn-]:before {
     position: absolute;
     top: 5px;
 }
-
-
-
 
 .ch-btn-preview:before {
     content: "\f025";
@@ -309,10 +322,15 @@ div.ch-controls .ch-indicator.active {
     border: 3px solid #EE5F5F;
 }
 
+.ch-note.assigned {
+    position: relative;
+    z-index: 99999;
+    background-color: rgb(196, 255, 246) !important;
+}
+
 div.ch-measure .ch-beat:nth-child(4n) {
     border-right: 5px solid white;
 }
-
 
 .pattern-controls {
     position: relative;
@@ -326,6 +344,7 @@ div.ch-measure .ch-beat:nth-child(4n) {
 .pattern-controls .pattern-import {
     left: 20px;
 }
+
 .pattern-controls .pattern-export {
     left: 25px;
     top: -1px;

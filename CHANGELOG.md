@@ -1,11 +1,11 @@
 TodoStack:
 (1) - split logic for drawing and playing, the current beatNumber (highlight 
 index), so i can paint each note according to the noteResolution and play notes
-(2) - colored assignment, add some mechanism to attach the user attention to 
+(2) *WIP* - colored assignment, add some mechanism to attach the user attention to 
 the keyboard and let him assign 1-2-3-4-5-6-7 notes (chords)
 release after a particular timeout)
 (3) - add notes and qwerty keys as label to the keyboard
-(4) - drag & dropp notes arround the channel bar (ctrl + dragg === copy)
+(4) - drag & drop notes around the channel bar (ctrl + drag === copy)
 (5) - TempoMat - changed noteResolution from 0 to 2 (quarter note) / buggy
 (6) - clear note by click + ESC
 (7) - refactor the UIManager - split into smaller pieces (UIChannel, UIControls)
@@ -13,7 +13,18 @@ release after a particular timeout)
 assign note (or notes) via clicking on the channel bar
 
 
-*0.0.71* (+5commits)
+*0.0.72*
+* tests - separated unit tests folder
+* UIManager - (CSS) overlay when assigning frequencies to notes,
+* UIManager - ESC clears the notes, emit `uiman:clearfreqs` and passes chIndex 
+* UIManager - implemented utils hash - obtain channel and channelBar indices
+and chBarIndex to the ChannelManager
+* UIManager - after assignment is completed, pass new freq array to 
+ChannelManager via `uiman:newfreqs` together with channel and channelBar indices
+* PollManager - class for performing actions once per interval, with basic API.
+* tests - for the PollManager class
+
+0.0.71
 * AudioOutput - trigger frequency (accepts an array of requires to be triggered)
 * AudioOutput - toggleMute persist the current volume in _tmp var and 
 restores on un-mute

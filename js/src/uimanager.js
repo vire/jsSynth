@@ -200,7 +200,7 @@ UIManager = (function() {
       patternCtrClass: 'pattern-controls',
       clearPatternClass: 'pattern-clear',
       importPatternClass: 'pattern-import',
-      exportPatternClass: 'pattern-export',
+      exportPatternClass: 'pattern-export'
     };
 
     compiled = Handlebars.compile(blueprint);
@@ -346,7 +346,7 @@ UIManager = (function() {
       }
 
       Channel.prototype.initialize = function() {
-        var channelClass, mainTemplate, params, self;
+        var channelClass, mainTemplate, self;
         self = this;
         channelClass =  'seq-channel-' + self.channelId;
         mainTemplate = '<div class=\'' + channelClass + '\'>';
@@ -434,36 +434,113 @@ UIManager = (function() {
       noteLength: self.signatureNoteLength
     };
     defaultChannels.forEach(function(chInfo) {
-      $('.seq-channels').append(new Channel(chInfo, loopProperties).toString());
-//      console.log(new Channel(chInfo, loopProperties).toString());
+      $('.seq-channels')
+        .append(new Channel(chInfo, loopProperties).toString());
     });
-//    console.log('ss', new Channel(channelParams, loopProperties).toString());
     return true;
   };
-
 
   /**
    * Initialize === add event listeners && handlers.
    * @method UIManager#initChannels
    */
   UIManager.prototype.initChannels = function() {
-	  var chNote, self;
+	  var keyboard;
+    var chNotes, overlay, self;
     self = this;
-	  chNote = $('.ch-note');
-	  chNote.unbind('click');
-    chNote.click(function() {
-      $(this).toggleClass('armed');
+
+    keyboard = $('#keyboard');
+
+    /** append overlay div to body if it does not exist */
+    if(!$('.overlay').length) {
+      /** capture user input logic */
+      $('body').prepend($('<div class="overlay">'))
+      overlay = $('.overlay');
+    } else {
+      overlay = $('.overlay');
+    }
+
+    /** select all chNotes === chBars*/
+    chNotes = $('.ch-note');
+
+    chNotes.unbind('click');
+
+    chNotes.click(function() {
+      var frequencies, el, channelIndex, channelBarIndex;
+      /** the clicked channelBar becomes element */
+      el = this;
+
+      channelIndex = self.utils.getChannelIndex(el);
+      channelBarIndex = self.utils.getChannelBarIndex(el);
+
+      frequencies = [];
+
+      /** listen for keypress druing assignment -
+       * ESC means clear the current array */
+      $(document).bind('keyup', function(e) {
+        if(27 === e.keyCode) {
+          frequencies = [];
+
+          self.em.emit('uiman:clearfreqs', channelIndex, channelBarIndex);
+
+          console.log('frequencies',frequencies);
+        }
+      });
+
+      keyboard.css('z-index','99999');
+
+      /** add the assignment class - z-index and background
+       * of the current channelBar
+       **/
+      $(el).toggleClass('assigned');
+
+      keyboard.bind('click', function(t) {
+        frequencies.push(t.target.id);
+      });
+
+      overlay.fadeIn(300);
+
+      /**
+       * Wait 4 seconds for assigning various notes
+       */
+      setTimeout(function() {
+        overlay.fadeOut(300);
+        keyboard.css('z-index','1');
+
+        /** when ESC is captured unbind the handler*/
+        $(document).unbind('keyup');
+
+        /** remove the assignment class */
+        $(el).toggleClass('assigned');
+
+        /**
+         * When no frequencies were assigned just return
+         * */
+        if(!frequencies.length) {
+          return false;
+        }
+
+        self.em.emit('uiman:newfreqs', channelIndex, channelBarIndex);
+        $(el).toggleClass('armed');
+
+        console.log(frequencies);
+      }, 4000);
     });
 
     $('.ch-btn-swap').click(function() {
-      var chControls, keyToPlay;
-      var swapEl = $(this);
-      var hancockKeys;
-      chControls = swapEl.parent().parent();
+      var hancockKeys, swapEl, channelControlsElem, keyToPlay;
+      swapEl = $(this);
+      channelControlsElem = swapEl.parent().parent();
       swapEl.addClass('active');
       if(window.HancockInstance) {
 
+        /** find Hancock in DOM*/
         hancockKeys = $('#keyboard ul li');
+
+        if(!hancockKeys) {
+          return;
+        }
+
         hancockKeys.each(function() {
           $(this).click(function(ev) {
             keyToPlay = ev.target.id;
@@ -471,9 +548,10 @@ UIManager = (function() {
               return;
             } else {
               console.log('keyToPlay',keyToPlay);
-              chControls.attr('data-key', keyToPlay);
-              chControls.addClass('assigned');
-              chControls.find('.ch-btn-preview').css('display','inline-block');
+              channelControlsElem.attr('data-key', keyToPlay);
+              channelControlsElem.addClass('assigned');
+              channelControlsElem.find('.ch-btn-preview')
+                .css('display','inline-block');
             }
             hancockKeys.each(function(){
               $(this).unbind('click');
@@ -485,6 +563,9 @@ UIManager = (function() {
       }
     });
 
+    /**
+     * TODO - to be removed when there is nothing to preview on channel level
+     */
     $('.ch-btn-preview').click(function() {
       var chControls, keyToTrigger;
       chControls = $(this).parent().parent();
@@ -538,14 +619,13 @@ UIManager = (function() {
    * @param  {number} index - cursor in tempo
    */
   UIManager.prototype.highlightItem = function(index) {
-    var tracksToPlay;
-    var self = this;
-    var keyToTrigger;
-    var indicator;
-    var tracks = $('div[class^=seq-channel-]');
-    var allNotes = tracks.find('.ch-note');
+    var allNotes, self, selectedNotes, tracks, tracksToPlay;
 
-    var selectedNotes = tracks.find('.ch-note:eq(' + index + ')');
+    tracks = $('div[class^=seq-channel-]');
+    allNotes = tracks.find('.ch-note');
+    selectedNotes = tracks.find('.ch-note:eq(' + index + ')');
+
+    self = this;
     allNotes.not(selectedNotes).removeClass('playing');
 
     selectedNotes.addClass('playing');
@@ -578,7 +658,6 @@ UIManager = (function() {
       indicator.classList.remove('active');
     }, 50);
   };
-
 
   UIManager.prototype.triggerNote = function(note) {
     if(!window.HancockInstance) {
@@ -615,6 +694,7 @@ UIManager = (function() {
     }, 150);
 
   };
+
   UIManager.prototype.updateBPM = function(bpmElem, newTempo) {
     var self = this;
     newTempo = 'number' === typeof newTempo ? newTempo : self.defaultBpm;
@@ -628,6 +708,23 @@ UIManager = (function() {
     var newWidth = (self.measures * 250) + 250 + 20;
     newWidth = newWidth <= 770 ? 770 : newWidth;
       $('#seq-ui').css('width', newWidth + 'px');
+  };
+
+  UIManager.prototype.utils = {
+    getChannelIndex: function(chBar) {
+      if(!chBar) {
+        return -1;
+      }
+      return + chBar.parentElement.parentElement.parentElement
+        .className.substr(12);
+    },
+    getChannelBarIndex: function(chBar) {
+      if(!chBar) {
+        return -1;
+      }
+      return Array.prototype.indexOf.call(chBar.parentNode.parentNode
+        .querySelectorAll('.ch-note'), chBar);
+    }
   };
 
   return UIManager;
