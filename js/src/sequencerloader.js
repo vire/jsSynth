@@ -10,7 +10,7 @@ bootSequencer = function() {
   var sequencerInstance;
   try {
     sequencerInstance =
-      Sequencer.getInstance(EventManager, TempoMat, UIManager);
+      Sequencer.getInstance(EventManager, TempoMat, UIManager, ChannelManager);
   } catch (e) {
     console.error('Error during initializing the Sequencer: ', e);
   }

@@ -1,22 +1,37 @@
-/*global UIManager:true, EventManager:true, Handlebars, $, console, synth */
+/*global Channel, ChannelManager, PollManager, EventManager:true, Handlebars,
+ $, console, synth */
+
+// TODO list
+
 
 /**
  * Responsible for drawing/rendering items from element list property into DOM
  * elements, attaching event handlers, subscribing to events.
- * @class
+ * @class UIManager
+ * @see {@link UIManager#UIManager}
  */
+var UIManager;
+
 UIManager = (function() {
   'use strict';
 
   /**
-   * @constructor
-   * @param {Object} opts
+   * @param opts {Object} options hash
+   * @constructor UIManager
    */
   function UIManager(opts) {
     opts = opts || {};
 
-    /** EventManager is a required component */
+    console.assert('undefined' !== typeof EventManager,
+      'EventManager must be defined');
     this.em = EventManager.getInstance();
+
+    /** we need the channel manager to update channels/audiooutputs -
+     * pub/sub could casue extra latency when dealing with patterns */
+
+    console.assert('undefined' !== typeof ChannelManager,
+      'ChannelManager must be defined');
+    this.chm = ChannelManager.getInstance();
 
     this.measures = opts.defaultMeasureCount || 1;
     this.signatureBeatCount = opts.signatureBeatCount || 4;
@@ -24,7 +39,6 @@ UIManager = (function() {
     this.defaultChannelCount = opts.defaultChannelCount || 1;
     this.defaultBpm = opts.defaultBpm || 140;
 
-    this.eventPrefix = 'uiman';
     this.rootContainerId = this.createRootElement();
     this.rootContainer = $('#' + this.rootContainerId);
     /** Bootstrap the UIManager */
@@ -91,18 +105,15 @@ UIManager = (function() {
    */
   UIManager.prototype.initialize = function() {
 
-    /**
-     * TODO - refactor channels (5/7/2014) move to separate UI class
-     */
-
     /** create the base wrappers for sequencer, controls and channels */
     this.rootContainer.append(this.createSeqWrapper());
-
     $('.seq-controls').append(this.createGeneralControls());
-
     this.initGeneralControlsHandlers();
 
-    this.createChannels();
+    /** create by default 1 channel with one measure
+     * which represent the current jsSynth preset.
+     */
+    this.createDefaultChannels();
     this.initChannels();
 
     /** UIManager API for other components  - depends on EventManager */
@@ -144,7 +155,7 @@ UIManager = (function() {
    * Append basic control elements - loops, tempo, patterns.
    * This creates only controls for the sequencer not for the channels.
    * @method  UIManager#createGeneralControls
-   * @return {String} compiled and interpolated tempalte
+   * @return {String} compiled and interpolated template
    */
   UIManager.prototype.createGeneralControls = function() {
     var blueprint, blueprintParams, compiled, self;
@@ -157,12 +168,12 @@ UIManager = (function() {
       '<span class={{loopPauseClass}}></span>' +
       '<span class={{loopStopClass}}></span></div>' +
       '<div class={{mainCtrClass}}><span class={{mainAddChClass}}>add channel' +
-        '</span><label for=\'measures\' >measures:</label>' +
+      '</span><label for=\'measures\' >measures:</label>' +
       '<input type=\'text\' name=\'measures\' class={{measuresClass}} ' +
       'value={{measureCount}} readonly>' +
-        '<span class={{measureUpClass}}></span>' +
-        '<span class={{measureDownClass}}></span>' +
-        '</div>' +
+      '<span class={{measureUpClass}}></span>' +
+      '<span class={{measureDownClass}}></span>' +
+      '</div>' +
       '<div class={{tempoCtrClass}}><label for=\'signature\'>signature:' +
       '</label><input type=\'text\' name=\'measures\' ' +
       'class={{signatureBeatsClass}} value={{signatureBeatCount}}>/' +
@@ -266,7 +277,7 @@ UIManager = (function() {
 
     $('.main-measures-up').click(function() {
       var measure = $('.main-measures-input');
-      measure.val(parseInt(measure.val(),10) + 1);
+      measure.val(parseInt(measure.val(), 10) + 1);
       measure.trigger('change');
     });
 
@@ -275,7 +286,7 @@ UIManager = (function() {
 
       var measureCnt = parseInt(measure.val(), 10);
 
-      if(measureCnt <= 1) {
+      if (measureCnt <= 1) {
         measure.val(1);
         return;
       }
@@ -287,12 +298,12 @@ UIManager = (function() {
       var channels, newVal, measure;
       newVal = $(this).val();
       channels = $('div[class^=seq-channel-]');
-      if(newVal <= 0) {
+      if (newVal <= 0) {
         $(this).val(1);
         return;
       }
 
-      if(self.measures < newVal) {
+      if (self.measures < newVal) {
         channels.each(function(ch, i) {
           measure = $(i).find('.ch-measure:last-child');
           measure.clone().appendTo(measure.parent());
@@ -312,153 +323,61 @@ UIManager = (function() {
   /**
    * Takes an list of channel as param, converts them into DOM objects,
    * wraps them into channel container and initialize channel handlers.
-   * @method UIManager#createChannels
-   * @param channels
+   * @method UIManager#createDefaultChannels
    * @returns {boolean}
    */
-  UIManager.prototype.createChannels = function(channels) {
-    var loopProperties;
-    var Channel, self;
+  UIManager.prototype.createDefaultChannels = function() {
+    return this.addChannel();
+  };
+
+
+  UIManager.prototype.addChannel = function() {
+    var chInfo, loopProperties, newChannel, self;
+
+    console.assert('undefined' !== typeof Channel, 'Channel must be defined!');
 
     self = this;
-    /**
-     * TODO (24/6/2014) not yet implemented!
-     * TODO - freq input can be replaced for piano key
-     */
-    var defaultChannels = channels || [
-      {
-        channelId: 0,
-        channelLabel: 'someLabel',
-        channelAudioExit: function() {
-        },
-        channelPattern: []
-      }
-    ];
-
-    Channel = (function() {
-      function Channel(opts, loopProps) {
-        this.channelId = opts.channelId;
-        this.channelLabel = opts.channelLabel;
-        this.measures = loopProps.measures;
-        this.beats = loopProps.beats;
-        this.noteLen = loopProps.noteLength;
-        this.initialize();
-      }
-
-      Channel.prototype.initialize = function() {
-        var channelClass, mainTemplate, self;
-        self = this;
-        channelClass =  'seq-channel-' + self.channelId;
-        mainTemplate = '<div class=\'' + channelClass + '\'>';
-        self.mainTemplate = mainTemplate + self.createChannelControls() +
-          self.createChannelContent(self.measures, self.beats, self.noteLen) +
-          '</div>';
-      };
-
-      Channel.prototype.createChannelControls = function() {
-        var playIndicator;
-        var buttons, volumeCtrl, freqCtrl, self;
-        var template, params;
-
-        self = this;
-
-        template = '<div class={{chControlsClass}}>' +
-          '<span class={{chLabelClass}}>{{chLabelText}}</span>';
-        volumeCtrl = '<div class={{volClass}}></div>';
-        freqCtrl = '<div class={{freqClass}}></div>';
-        playIndicator = '<div class={{indicatorClass}}></div>';
-        buttons = '<div class={{buttonsClass}}>' +
-          '<span class={{swapClass}} title="sawp sample"></span>' +
-          '<span class={{removeClass}} title="remove"></span>' +
-          '<span class={{previewClass}} title="preview"></span>' +
-          '<span class={{muteClass}} title="mute"></span>' +
-          '<span class={{soloClass}} title="solo"></span></div>';
-
-        template = template + volumeCtrl + freqCtrl + playIndicator + buttons +
-          '</div>';
-        params = {
-          chControlsClass: 'ch-controls',
-          chLabelClass: 'ch-label',
-          chLabelText: self.channelLabel,
-          volClass: 'volume-controls',
-          freqClass: 'freq-controls',
-          indicatorClass: 'ch-indicator',
-          buttonsClass: 'ch-buttons',
-          swapClass: 'ch-btn-swap',
-          removeClass: 'ch-btn-remove',
-          previewClass: 'ch-btn-preview',
-          muteClass: 'ch-btn-mute',
-          soloClass: 'ch-btn-solo'
-        };
-
-        return Handlebars.compile(template)(params);
-      };
-
-      Channel.prototype.createChannelContent =
-        function(measures, beats, noteLength) {
-          var template, params;
-
-          params = {
-            measureClass: 'ch-measure',
-            beatsClass: 'ch-beat',
-            noteClass: 'ch-note'
-          };
-
-          template = '';
-          var i, j, k;
-          for(i = 0; i < measures; i++ ) {
-            template += '<div class={{measureClass}}>';
-            for(j = 0; j < beats; j++) {
-              template += '<div class={{beatsClass}}>';
-              for(k = 0; k < noteLength; k++) {
-                template += '<div class={{noteClass}}></div>';
-              }
-              template += '</div>';
-            }
-            template += '</div>';
-          }
-          return Handlebars.compile(template)(params);
-        };
-
-      Channel.prototype.toString = function() {
-        return this.mainTemplate;
-
-      };
-
-      return Channel;
-    })();
 
     loopProperties = {
       measures: self.measures,
       beats: self.signatureBeatCount,
       noteLength: self.signatureNoteLength
     };
-    defaultChannels.forEach(function(chInfo) {
-      $('.seq-channels')
-        .append(new Channel(chInfo, loopProperties).toString());
-    });
+
+    // TODO replace this for something more meaningful
+    chInfo = {
+      channelId: 0, // get next channel ID from ChannelManager
+      channelLabel: 'nameOfThePreset' // save the name as the preset
+    };
+
+    newChannel = new Channel(chInfo, loopProperties);
+
+    /** render the ui-channel template into DOM */
+    $('.seq-channels').append(newChannel.toString());
+
+    // call channelmanager with the current synth instance.
+    // assume its done an in the callback we paint this as assigned
+    $('.ch-btn-swap').parent().parent().addClass('assigned');
+
     return true;
   };
 
+  UIManager.prototype.removeChannel = function(channelId, channelIndex) {
+    throw 'not yet implemented';
+  };
+
   /**
-   * Initialize === add event listeners && handlers.
+   * Initialize === add event listeners && handlers. Add handler to the
+   * channel instance DOM elements - click, keydown, etc.
    * @method UIManager#initChannels
    */
   UIManager.prototype.initChannels = function() {
-	  var keyboard;
+    var keyboard;
     var chNotes, overlay, self;
     self = this;
 
     keyboard = $('#keyboard');
-
-    /** append overlay div to body if it does not exist */
-    if(!$('.overlay').length) {
-      /** capture user input logic */
-      $('body').prepend($('<div class="overlay">'))
-      overlay = $('.overlay');
-    } else {
-      overlay = $('.overlay');
-    }
+    overlay = self.utils.appendOverlay();
 
     /** select all chNotes === chBars*/
     chNotes = $('.ch-note');
@@ -466,100 +385,100 @@ UIManager = (function() {
     chNotes.unbind('click');
 
     chNotes.click(function() {
+      var pm;
       var frequencies, el, channelIndex, channelBarIndex;
+
       /** the clicked channelBar becomes element */
       el = this;
-
+      frequencies = [];
       channelIndex = self.utils.getChannelIndex(el);
       channelBarIndex = self.utils.getChannelBarIndex(el);
+      /** just to make sure we have the class available  */
+      console.assert(typeof PollManager !== 'undefined',
+        'PollManager must be defined');
 
-      frequencies = [];
+      keyboard.css('z-index', '99999');
 
-      /** listen for keypress druing assignment -
-       * ESC means clear the current array */
-      $(document).bind('keyup', function(e) {
-        if(27 === e.keyCode) {
-          frequencies = [];
-
-          self.em.emit('uiman:clearfreqs', channelIndex, channelBarIndex);
-
-          console.log('frequencies',frequencies);
+      function tearDown() {
+        console.log('tearDown called');
+        overlay.fadeOut(300);
+        keyboard.css('z-index', '1');
+        /** when ESC is captured unbind the handler*/
+        self.utils.stopListenOnKeyPress();
+        /** remove the assignment class */
+        $(el).removeClass('assigned');
+        if (frequencies.length > 0) {
+          $(el).addClass('armed');
+        } else {
+          $(el).removeClass('armed');
         }
-      });
+      }
 
-      keyboard.css('z-index','99999');
+      function checkFreqLength() {
+        console.log('checkFreqLength', frequencies);
+        console.log('frequencies.length', frequencies.length);
+        return frequencies.length > 3;
+      }
+
+      pm = new PollManager({
+        countLimit: 4,
+        timeLimit: 15000,
+        stepTimeout: 1200
+      }, checkFreqLength, limitFn, finalizeFn);
+
+      pm.initialize();
+
+      self.utils.startListenOnKeyPress(self, function(updatedFrequencies) {
+        if (!frequencies) {
+          return;
+        }
+
+        if (!updatedFrequencies.length) {
+          console.log('stop should be called');
+          // self.em.emit('uiman:clearfreqs', channelIndex, channelBarIndex);
+          pm.stop();
+          tearDown();
+        }
+
+        frequencies = updatedFrequencies;
+        console.log('frequencies', frequencies);
+      });
 
       /** add the assignment class - z-index and background
        * of the current channelBar
        **/
-      $(el).toggleClass('assigned');
+      if (!$(el).hasClass('assigned')) {
+        $(el).addClass('assigned');
+      }
 
+      /** listen on hancock keyboard for clicks and extract frequencies */
       keyboard.bind('click', function(t) {
         frequencies.push(t.target.id);
+        pm.reset();
       });
 
       overlay.fadeIn(300);
 
-      /**
-       * Wait 4 seconds for assigning various notes
-       */
-      setTimeout(function() {
-        overlay.fadeOut(300);
-        keyboard.css('z-index','1');
+      function finalizeFn() {
+        console.log('finalizeFn called');
+        tearDown();
+        self.em.emit('uiman:newfreqs', channelIndex, channelBarIndex);
 
-        /** when ESC is captured unbind the handler*/
-        $(document).unbind('keyup');
+        // TODO - this will not be called when limit is called
+        $(el).data('freqs',frequencies);
+        console.log(frequencies);
+        console.log($(el));
+      }
 
-        /** remove the assignment class */
-        $(el).toggleClass('assigned');
-
+      function limitFn() {
+        console.log('limitFn called');
+        tearDown();
         /**
          * When no frequencies were assigned just return
          * */
-        if(!frequencies.length) {
+        if (!frequencies.length) {
           return false;
         }
-
-        self.em.emit('uiman:newfreqs', channelIndex, channelBarIndex);
-        $(el).toggleClass('armed');
-
-        console.log(frequencies);
-      }, 4000);
-    });
-
-    $('.ch-btn-swap').click(function() {
-      var hancockKeys, swapEl, channelControlsElem, keyToPlay;
-      swapEl = $(this);
-      channelControlsElem = swapEl.parent().parent();
-      swapEl.addClass('active');
-      if(window.HancockInstance) {
-
-        /** find Hancock in DOM*/
-        hancockKeys = $('#keyboard ul li');
-
-        if(!hancockKeys) {
-          return;
-        }
-
-        hancockKeys.each(function() {
-          $(this).click(function(ev) {
-            keyToPlay = ev.target.id;
-            if(!keyToPlay) {
-              return;
-            } else {
-              console.log('keyToPlay',keyToPlay);
-              channelControlsElem.attr('data-key', keyToPlay);
-              channelControlsElem.addClass('assigned');
-              channelControlsElem.find('.ch-btn-preview')
-                .css('display','inline-block');
-            }
-            hancockKeys.each(function(){
-              $(this).unbind('click');
-              swapEl.removeClass('active');
-
-            });
-          });
-        });
       }
     });
 
@@ -570,10 +489,14 @@ UIManager = (function() {
       var chControls, keyToTrigger;
       chControls = $(this).parent().parent();
       keyToTrigger = chControls.attr('data-key');
-      if(keyToTrigger) {
+      if (keyToTrigger) {
         self.triggerNote(keyToTrigger);
       }
     });
+
+    /** bind a handler for adding channels */
+    $('.main-add-channel').click(this.utils.addChannelHandler.bind(this));
+
   };
 
   /**
@@ -614,6 +537,7 @@ UIManager = (function() {
   };
 
   /**
+   * TODO - this will change when audio gets triggered form elsewhere.
    * On every tick from TempoMat, this fn adds a highlight to the respective
    * element(item) in the channel's pattern.
    * @param  {number} index - cursor in tempo
@@ -629,7 +553,7 @@ UIManager = (function() {
     allNotes.not(selectedNotes).removeClass('playing');
 
     selectedNotes.addClass('playing');
-    if(selectedNotes.hasClass('armed')) {
+    if (selectedNotes.hasClass('armed')) {
 
       tracksToPlay = selectedNotes.filter($('.armed'))
         .parent().parent().parent();
@@ -637,8 +561,10 @@ UIManager = (function() {
       tracksToPlay.each(function(z, e) {
         self.tickIndicator(e.children[0].children[3]);
 
-        self.triggerNote(tracksToPlay.find('.ch-controls')
-          .attr('data-key'));
+        console.log('tracksToPlay.data()', $(e));
+        console.log('tracksToPlay.data()', $(e).data());
+//        self.triggerNote(tracksToPlay.find('.ch-controls')
+//          .attr('data-key'));
       });
     }
   };
@@ -659,40 +585,25 @@ UIManager = (function() {
     }, 50);
   };
 
+  /**
+   * TODO - this will be removed when audio will be triggered from elsewhere
+   * @param note
+   */
   UIManager.prototype.triggerNote = function(note) {
-    if(!window.HancockInstance) {
+    if (!window.HancockInstance) {
       return;
     }
     var frequency;
 
     frequency = window.HancockInstance.getFreqI(note);
-    if(!frequency) {
+    if (!frequency) {
       return;
     }
 
     window.HancockInstance.keyDown(note, frequency);
     setTimeout(function() {
       window.HancockInstance.keyUp(note, frequency);
-    },200);
-  };
-
-  UIManager.prototype.triggerKey = function(keyToTrigger) {
-    if(!keyToTrigger) {
-      return;
-    }
-
-    keyToTrigger = keyToTrigger.toUpperCase().charCodeAt(0);
-
-    var e1 = $.Event('keydown');
-    e1.keyCode= keyToTrigger;
-    $(document).trigger(e1);
-
-    var e2 = $.Event('keyup');
-    e2.keyCode = keyToTrigger;
-    setTimeout(function() {
-      $(document).trigger(e2);
-    }, 150);
-
+    }, 200);
   };
 
   UIManager.prototype.updateBPM = function(bpmElem, newTempo) {
@@ -702,28 +613,68 @@ UIManager = (function() {
     self.em.emit('uiman:tempochange', newTempo);
   };
 
+  /**
+   * Adjust the sequencer wrapper width according to no. of measures.
+   * @method UIManager#updateSeqWrapperWidth
+   */
   UIManager.prototype.updateSeqWrapperWidth = function() {
     var self;
     self = this;
     var newWidth = (self.measures * 250) + 250 + 20;
     newWidth = newWidth <= 770 ? 770 : newWidth;
-      $('#seq-ui').css('width', newWidth + 'px');
+    $('#seq-ui').css('width', newWidth + 'px');
   };
 
   UIManager.prototype.utils = {
+    addChannelHandler: function() {
+      // TODO - implement adding new channels via UIManager
+      // this will add a new channel to the channelManager
+      // with the current jsSynth preset / instance
+      // self.addChannel()
+      throw 'not yet implemented';
+    },
     getChannelIndex: function(chBar) {
-      if(!chBar) {
+      if (!chBar) {
         return -1;
       }
-      return + chBar.parentElement.parentElement.parentElement
+      return +chBar.parentElement.parentElement.parentElement
         .className.substr(12);
     },
     getChannelBarIndex: function(chBar) {
-      if(!chBar) {
+      if (!chBar) {
         return -1;
       }
       return Array.prototype.indexOf.call(chBar.parentNode.parentNode
         .querySelectorAll('.ch-note'), chBar);
+    },
+    appendOverlay: function() {
+      var _tmpOverlay;
+
+      _tmpOverlay = null;
+      /** append overlay div to body if it does not exist */
+      if (!$('.overlay').length) {
+        /** capture user input logic */
+        $('body').prepend($('<div class="overlay">'))
+        _tmpOverlay = $('.overlay');
+      } else {
+        _tmpOverlay = $('.overlay');
+      }
+
+      return _tmpOverlay;
+    },
+    startListenOnKeyPress: function(self, cb) {
+      /** listen for keypress events during assignment -
+       * ESC means clear the current array */
+      $(document).bind('keyup', function(e) {
+        /** start listening for ESC */
+        if (27 === e.keyCode) {
+          cb([]);
+        }
+        // TODO probalby listen to all hancock keys and turn them into freqs
+      });
+    },
+    stopListenOnKeyPress: function() {
+      $(document).unbind('keyup');
     }
   };
 

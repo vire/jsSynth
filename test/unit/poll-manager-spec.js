@@ -149,4 +149,26 @@ describe('Tiny poll Manager', function() {
 
   });
 
+  it('can be reset during the run', function(done){
+    var pm;
+    pm = new PollManager();
+    spyOn(pm, 'initialize').and.callThrough();
+    spyOn(pm, 'stop').and.callThrough();
+
+    pm.initialize();
+
+    setTimeout(function() {
+      expect(pm.getStatus()).toBeTruthy();
+    }, 2500);
+
+    pm.reset();
+
+    setTimeout(function() {
+      expect(pm.stop).toHaveBeenCalled();
+      expect(pm.initialize).toHaveBeenCalled();
+      expect(pm.initialize.calls.count()).toEqual(2);
+      done();
+    }, 2500);
+  });
+
 });

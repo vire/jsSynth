@@ -1,8 +1,7 @@
 var ChannelManager;
 
 
-// todolist 5/7/2011
-// todo - introduce API for EventManager
+// todo - integrate with EventManager (via API)
 
 ChannelManager = (function() {
   'use strict';
@@ -15,6 +14,12 @@ ChannelManager = (function() {
 
   ChannelManager._instance = null;
 
+  /**
+   * Returns singleton instance.
+   * @method ChannelManager.getInstance
+   * @static
+   * @returns {null|*}
+   */
   ChannelManager.getInstance = function() {
     return this._instance || (this._instance = (function(func, args, ctor) {
       ctor.prototype = func.prototype;
@@ -23,7 +28,15 @@ ChannelManager = (function() {
     })(this, arguments, function(){}));
   };
 
+  /**
+   * Pattern instance factory.
+   * @param newIndex
+   * @param id
+   * @private
+   * @returns {*|number|t.pattLength}
+   */
   ChannelManager.prototype.initializePattern = function(newIndex, id) {
+    // TODO - determine how to get the length :D
     this._patterns[newIndex] = new Pattern(length, id);
     return this._patterns[newIndex].pattLength;
   };
@@ -62,6 +75,11 @@ ChannelManager = (function() {
     return this._audioOutputs.splice(index, 1);
   };
 
+  /**
+   * AudioOutput factory and initialization function.
+   * @param preset
+   * @param synthInstance
+   */
   ChannelManager.prototype.assignAudioOutput = function(preset, synthInstance) {
     var audioOutput = new AudioOutput(preset, synthInstance);
     var newIndex = this._audioOutputs.push(audioOutput) - 1;

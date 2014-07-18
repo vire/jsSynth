@@ -73,8 +73,10 @@ EventManager = (function() {
     subscribers.push({emitFn: emitFn, context: context});
   };
 
+
+
   /**
-   * If needed in the future removing/ deregistering events.
+   * If needed in the future removing/ de-registering events.
    */
   EventManager.prototype.deregister = function() {
 

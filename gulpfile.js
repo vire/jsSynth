@@ -6,8 +6,11 @@ var gulp = require('gulp'),
 var paths = {
 	scripts: [
 		'js/src/eventmanager.js',
+    'js/src/ui-channel.js',
+    'js/src/channel-manager.js',
 		'js/src/tempo.js',
 		'js/src/tempomat.js',
+		'js/src/poll-manager.js',
 		'js/src/uimanager.js',
 		'js/src/sequencer.js',
 		'js/src/sequencerloader.js',

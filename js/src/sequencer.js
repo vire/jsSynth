@@ -10,17 +10,19 @@ Sequencer = (function() {
 
   /**
    * @constructor
-   * @param {Function} EventManagerClass [description]
-   * @param {Function} TempoMat       [description]
-   * @param {Function} UiManagerClass    [description]
-   * @param {Function} optionsHash       [description]
+   * @param {Function} EventManagerClass
+   * @param {Function} TempoMat
+   * @param {Function} UiManagerClass
+   * @param {Function} ChannelManagerClass
    */
-  function Sequencer(EventManagerClass, TempoMat, UiManagerClass, optionsHash) {
+  function Sequencer(EventManagerClass, TempoMat, UiManagerClass,
+                     ChannelManagerClass) {
     this.name = name || 'Sequencer';
 
     this.eventManager = null;
     this.tempo = null;
     this.uiManager = null;
+    this.channelManager = null;
     
     /**
      * Composes all together
@@ -37,9 +39,10 @@ Sequencer = (function() {
       this.uiManager = UiManagerClass.getInstance({
         em : this.eventManager
       });
+      this.channelManager = ChannelManagerClass.getInstance();
     };
 
-    /**  autoinitialize! */
+    /**  auto-initialize! */
     this.main();
   }
 
