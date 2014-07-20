@@ -1,5 +1,6 @@
-var ChannelManager;
+/*globals EventManager, AudioContext */
 
+var ChannelManager;
 
 // todo - integrate with EventManager (via API)
 
@@ -10,6 +11,17 @@ ChannelManager = (function() {
     this._audioOutputs = [];
     this._patterns = [];
     this._patternsLength = 0;
+
+    this.API = {
+      'tempo:tick': this.playBar,
+      'uiman:frequpdate': this.assignFreqProxy
+    };
+
+    console.assert('undefined' !== typeof EventManager,
+      'EventManager must be defined');
+    this.em = EventManager.getInstance();
+
+    this.em.register(this.API, null, this);
   }
 
   ChannelManager._instance = null;
@@ -51,6 +63,10 @@ ChannelManager = (function() {
     this._audioOutputs[aoIndex] = updatedAO;
   };
 
+  ChannelManager.prototype.assignFreqProxy = function(d) {
+    this.assignChannelBar(d.channelIndex, d.channelBarIndex, d.frequencies);
+  };
+
   ChannelManager.prototype.assignChannelBar =
     function (chIndex, chBarIndex, freq) {
       if(!this._patterns[chIndex]) {
@@ -83,11 +99,12 @@ ChannelManager = (function() {
   ChannelManager.prototype.assignAudioOutput = function(preset, synthInstance) {
     var audioOutput = new AudioOutput(preset, synthInstance);
     var newIndex = this._audioOutputs.push(audioOutput) - 1;
+    // TODO - create here ChannelUI instance and return it back to UI Manager?
     this._patternsLength = this.initializePattern(newIndex, audioOutput.id);
   };
 
   ChannelManager.prototype.updatePatternsLength = function(newLength) {
-    var result, self;
+    var self;
     self = this;
     if(this._patternsLength === newLength) {
       return this._patternsLength;
@@ -176,7 +193,7 @@ ChannelManager = (function() {
       if(!self.getFreqsAtIndex(idx, chBarIndex)) {
         return;
       }
-      audioOut.triggerFreq();
+      audioOut.triggerFreq(self.getFreqsAtIndex(idx, chBarIndex));
     });
   };
 
@@ -190,6 +207,7 @@ AudioOutput = (function() {
   function AudioOutput(preset, jsSynthInstance) {
     this.preset = preset || {};
     this.jsSynthInstance = jsSynthInstance || {};
+
     this.volume = 1.0;
     this.isMuted = false;
     this.isSolo = false;
@@ -251,7 +269,26 @@ AudioOutput = (function() {
   };
 
   AudioOutput.prototype.triggerFreq = function(freqArray) {
+    var self;
+    self = this;
+
+    /** this is here only for DEV purpose and to make PhantomJS tests pass */
+    if(!AudioContext) {
+      return;
+    }
+
+    if(AudioContext && 'undefined' === typeof self.context) {
+      self.context = new AudioContext(); // TODO make this passed as argument
+    }
+
     freqArray.forEach(function(frequency) {
+      var osc = self.context.createOscillator();
+      osc.connect(self.context.destination);
+      osc.frequency.value = frequency;
+      osc.start();
+      setTimeout(function() {
+        osc.stop();
+      }, 250);
       return 'played frequency: ' + frequency;
     });
   };

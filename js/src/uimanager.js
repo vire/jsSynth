@@ -1,14 +1,11 @@
 /*global Channel, ChannelManager, PollManager, EventManager:true, Handlebars,
  $, console, synth */
 
-// TODO list
-
-
 /**
  * Responsible for drawing/rendering items from element list property into DOM
  * elements, attaching event handlers, subscribing to events.
  * @class UIManager
- * @see {@link UIManager#UIManager}
+ * @see {@link UIManager}
  */
 var UIManager;
 
@@ -39,6 +36,7 @@ UIManager = (function() {
     this.defaultChannelCount = opts.defaultChannelCount || 1;
     this.defaultBpm = opts.defaultBpm || 140;
 
+    this.channelList = [];
     this.rootContainerId = this.createRootElement();
     this.rootContainer = $('#' + this.rootContainerId);
     /** Bootstrap the UIManager */
@@ -324,13 +322,17 @@ UIManager = (function() {
    * Takes an list of channel as param, converts them into DOM objects,
    * wraps them into channel container and initialize channel handlers.
    * @method UIManager#createDefaultChannels
-   * @returns {boolean}
+   * @returns {Number} - length of the channelList array
    */
   UIManager.prototype.createDefaultChannels = function() {
     return this.addChannel();
   };
 
 
+  /**
+   * @method UIManager#addChannel
+   * @returns {Number} - length of the channels
+   */
   UIManager.prototype.addChannel = function() {
     var chInfo, loopProperties, newChannel, self;
 
@@ -344,22 +346,24 @@ UIManager = (function() {
       noteLength: self.signatureNoteLength
     };
 
-    // TODO replace this for something more meaningful
+    // TODO - UI Channel needs the name of the preset and ID
     chInfo = {
       channelId: 0, // get next channel ID from ChannelManager
       channelLabel: 'nameOfThePreset' // save the name as the preset
     };
 
     newChannel = new Channel(chInfo, loopProperties);
-
+    var newChannelElement = ($(newChannel.toString()));
     /** render the ui-channel template into DOM */
-    $('.seq-channels').append(newChannel.toString());
+    $('.seq-channels').append(newChannelElement);
 
+    // TODO - this needs to get more sophisticated
+    // get currentPattern, getCurrentContext
+    self.chm.assignAudioOutput();
     // call channelmanager with the current synth instance.
     // assume its done an in the callback we paint this as assigned
     $('.ch-btn-swap').parent().parent().addClass('assigned');
-
-    return true;
+    return self.channelList.push(newChannel);
   };
 
   UIManager.prototype.removeChannel = function(channelId, channelIndex) {
@@ -381,7 +385,6 @@ UIManager = (function() {
 
     /** select all chNotes === chBars*/
     chNotes = $('.ch-note');
-
     chNotes.unbind('click');
 
     chNotes.click(function() {
@@ -396,6 +399,13 @@ UIManager = (function() {
       /** just to make sure we have the class available  */
       console.assert(typeof PollManager !== 'undefined',
         'PollManager must be defined');
+      pm = new PollManager({
+        countLimit: 4,
+        timeLimit: 15000,
+        stepTimeout: 1200
+      }, checkFreqLength, limitFn, finalizeFn);
+
+      pm.initialize();
 
       keyboard.css('z-index', '99999');
 
@@ -403,6 +413,7 @@ UIManager = (function() {
         console.log('tearDown called');
         overlay.fadeOut(300);
         keyboard.css('z-index', '1');
+        keyboard.off('click');
         /** when ESC is captured unbind the handler*/
         self.utils.stopListenOnKeyPress();
         /** remove the assignment class */
@@ -412,6 +423,16 @@ UIManager = (function() {
         } else {
           $(el).removeClass('armed');
         }
+//        self.chm.assignChannelBar(channelIndex, channelBarIndex, frequencies);
+        // TODO - decide if pub/sub or direct
+        console.log('emit uiman:frequpdate', channelIndex, channelBarIndex, frequencies )
+        self.em.emit('uiman:frequpdate',
+          {
+            channelIndex: channelIndex,
+            channelBarIndex: channelBarIndex,
+            frequencies: frequencies
+          });
+        frequencies = [];
       }
 
       function checkFreqLength() {
@@ -420,13 +441,6 @@ UIManager = (function() {
         return frequencies.length > 3;
       }
 
-      pm = new PollManager({
-        countLimit: 4,
-        timeLimit: 15000,
-        stepTimeout: 1200
-      }, checkFreqLength, limitFn, finalizeFn);
-
-      pm.initialize();
 
       self.utils.startListenOnKeyPress(self, function(updatedFrequencies) {
         if (!frequencies) {
@@ -452,9 +466,9 @@ UIManager = (function() {
       }
 
       /** listen on hancock keyboard for clicks and extract frequencies */
-      keyboard.bind('click', function(t) {
-        frequencies.push(t.target.id);
-        pm.reset();
+      keyboard.on('click', function(t) {
+        frequencies.push(self.utils.noteToFreq(t.target.id));
+        pm.reset(); // todo  remove reset and think about a new mechanism
       });
 
       overlay.fadeIn(300);
@@ -462,12 +476,6 @@ UIManager = (function() {
       function finalizeFn() {
         console.log('finalizeFn called');
         tearDown();
-        self.em.emit('uiman:newfreqs', channelIndex, channelBarIndex);
-
-        // TODO - this will not be called when limit is called
-        $(el).data('freqs',frequencies);
-        console.log(frequencies);
-        console.log($(el));
       }
 
       function limitFn() {
@@ -544,12 +552,12 @@ UIManager = (function() {
    */
   UIManager.prototype.highlightItem = function(index) {
     var allNotes, self, selectedNotes, tracks, tracksToPlay;
-
+    self = this;
     tracks = $('div[class^=seq-channel-]');
     allNotes = tracks.find('.ch-note');
     selectedNotes = tracks.find('.ch-note:eq(' + index + ')');
 
-    self = this;
+
     allNotes.not(selectedNotes).removeClass('playing');
 
     selectedNotes.addClass('playing');
@@ -560,11 +568,6 @@ UIManager = (function() {
 
       tracksToPlay.each(function(z, e) {
         self.tickIndicator(e.children[0].children[3]);
-
-        console.log('tracksToPlay.data()', $(e));
-        console.log('tracksToPlay.data()', $(e).data());
-//        self.triggerNote(tracksToPlay.find('.ch-controls')
-//          .attr('data-key'));
       });
     }
   };
@@ -590,12 +593,13 @@ UIManager = (function() {
    * @param note
    */
   UIManager.prototype.triggerNote = function(note) {
+    var frequency;
+
     if (!window.HancockInstance) {
       return;
     }
-    var frequency;
 
-    frequency = window.HancockInstance.getFreqI(note);
+    frequency = this.utils.noteToFreq(note);
     if (!frequency) {
       return;
     }
@@ -654,7 +658,7 @@ UIManager = (function() {
       /** append overlay div to body if it does not exist */
       if (!$('.overlay').length) {
         /** capture user input logic */
-        $('body').prepend($('<div class="overlay">'))
+        $('body').prepend($('<div class="overlay">'));
         _tmpOverlay = $('.overlay');
       } else {
         _tmpOverlay = $('.overlay');
@@ -675,6 +679,11 @@ UIManager = (function() {
     },
     stopListenOnKeyPress: function() {
       $(document).unbind('keyup');
+    },
+    noteToFreq: function(note) {
+      console.assert('function' === typeof HancockInstance.getFreqI,
+        'Hancock must be exposed with the getFrequency method');
+      return window.HancockInstance.getFreqI(note);
     }
   };
 

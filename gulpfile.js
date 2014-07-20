@@ -24,7 +24,7 @@ gulp.task('clean', function(cb) {
 
 gulp.task('scripts', ['clean'], function() {
 	return gulp.src(paths.scripts)
-		.pipe(uglify())
+//		.pipe(uglify())
 		.pipe(concat('seq.min.js'))
 		.pipe(gulp.dest('dist'));
 
